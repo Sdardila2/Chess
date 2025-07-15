@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdlib> 
 #include <vector>
 using namespace std;
 
@@ -59,7 +60,6 @@ public:
 
 int main()
 {
-
 	int filas_movidas;
 	int columnas_movidas;
 	string capturas_totales = "";
@@ -119,15 +119,29 @@ int main()
 	while (true)
 	{
 		cout << "Turno jugador " << jugador_actual.nombre << endl << endl;
-		for (int i = 0; i <= 8 - 1; i++)
-		{
-			for (int j = 0; j <= 8 - 1; j++)
-			{
-				cout << tablero[i][j].elemento.nombre << " ";
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				bool casillaClara = (i + j) % 2 == 0;
+
+				string fondo = casillaClara ? "\033[47m" : "\033[43m";  // Blanco o marrón (amarillo oscuro)
+				string texto = casillaClara ? "\033[30m" : "\033[30m";  // Texto negro en ambos casos
+				string reset = "\033[0m";
+
+				string nombre = tablero[i][j].elemento.nombre;
+
+				if (nombre.empty()) {
+					cout << fondo << texto << "  " << reset;
+				}
+				else {
+					if (nombre.length() == 1) nombre = " " + nombre;
+					cout << fondo << texto << nombre << reset;
+				}
 			}
 			cout << endl;
-			cout << endl;
 		}
+
+
+
 		cout << "Elementos y posiciones disponibles:" << endl;
 
 		for (int i = 0; i <= 8 - 1; i++)
