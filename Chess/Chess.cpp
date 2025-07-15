@@ -1,4 +1,7 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
+#include <sstream>
+#include <fstream>
 #include <cstdlib> 
 #include <vector>
 using namespace std;
@@ -58,14 +61,21 @@ public:
 	}
 };
 
+
+
 int main()
 {
+	string answer;
+	string winner;
+	string state = "active";
+	string nombre_archivo;
 	int filas_movidas;
 	int columnas_movidas;
-	string capturas_totales = "";
-	Jugador jugador_1 = Jugador("Samuel", "", 0);
-	Jugador jugador_2 = Jugador("Salome", "", 1);
-	Jugador jugador_actual = jugador_1;
+	Jugador jugador_actual;
+	Jugador jugador_1;
+	jugador_1 = Jugador("", "", 0);
+	Jugador jugador_2;
+	jugador_2 = Jugador("", "", 1);
 	Casilla tablero[8][8];
 
 	for (int i = 0; i <= 8 - 1; i++)
@@ -75,46 +85,152 @@ int main()
 			tablero[i][j] = Casilla({ i, j }, Elemento(-1, "  ", "vacio", -1, { i, j }));
 		}
 	}
+	
+	int op;
+	cout << "Desea crear una nueva partida o cargar una? (0 = nueva, 1 = cargar partida): " << endl;
+	cin >> op;
+	if (op == 0) {
+		cout << "Ingrese el nombre de su nueva partida: " << endl;
+		cin >> nombre_archivo;
+		cout << "Ingrese el nombre del jugador 0: " << endl;
+		cin >> jugador_1.nombre;
+		cout << "Ingrese el nombre del jugador 1: " << endl;
+		cin >> jugador_2.nombre;
+		jugador_actual = jugador_1;
+		
+		// Peones del jugador 0 (blancas)
+		tablero[1][0].elemento = Elemento(jugador_1.numero, "P1", "peon", 0, tablero[1][0].posicion);
+		tablero[1][1].elemento = Elemento(jugador_1.numero, "P2", "peon", 0, tablero[1][1].posicion);
+		tablero[1][2].elemento = Elemento(jugador_1.numero, "P3", "peon", 0, tablero[1][2].posicion);
+		tablero[1][3].elemento = Elemento(jugador_1.numero, "P4", "peon", 0, tablero[1][3].posicion);
+		tablero[1][4].elemento = Elemento(jugador_1.numero, "P5", "peon", 0, tablero[1][4].posicion);
+		tablero[1][5].elemento = Elemento(jugador_1.numero, "P6", "peon", 0, tablero[1][5].posicion);
+		tablero[1][6].elemento = Elemento(jugador_1.numero, "P7", "peon", 0, tablero[1][6].posicion);
+		tablero[1][7].elemento = Elemento(jugador_1.numero, "P8", "peon", 0, tablero[1][7].posicion);
 
-	// Peones del jugador 0 (blancas)
-	tablero[1][0].elemento = Elemento(jugador_1.numero, "P1", "peon", 0, tablero[1][0].posicion);
-	tablero[1][1].elemento = Elemento(jugador_1.numero, "P2", "peon", 0, tablero[1][1].posicion);
-	tablero[1][2].elemento = Elemento(jugador_1.numero, "P3", "peon", 0, tablero[1][2].posicion);
-	tablero[1][3].elemento = Elemento(jugador_1.numero, "P4", "peon", 0, tablero[1][3].posicion);
-	tablero[1][4].elemento = Elemento(jugador_1.numero, "P5", "peon", 0, tablero[1][4].posicion);
-	tablero[1][5].elemento = Elemento(jugador_1.numero, "P6", "peon", 0, tablero[1][5].posicion);
-	tablero[1][6].elemento = Elemento(jugador_1.numero, "P7", "peon", 0, tablero[1][6].posicion);
-	tablero[1][7].elemento = Elemento(jugador_1.numero, "P8", "peon", 0, tablero[1][7].posicion);
+		// Piezas principales del jugador 0
+		tablero[0][0].elemento = Elemento(jugador_1.numero, "T1", "torre", 0, tablero[0][0].posicion);
+		tablero[0][1].elemento = Elemento(jugador_1.numero, "C1", "caballo", 0, tablero[0][1].posicion);
+		tablero[0][2].elemento = Elemento(jugador_1.numero, "A1", "alfil", 0, tablero[0][2].posicion);
+		tablero[0][3].elemento = Elemento(jugador_1.numero, "R1", "rey", 0, tablero[0][3].posicion);
+		tablero[0][4].elemento = Elemento(jugador_1.numero, "D1", "dama", 0, tablero[0][4].posicion);
+		tablero[0][5].elemento = Elemento(jugador_1.numero, "A2", "alfil", 0, tablero[0][5].posicion);
+		tablero[0][6].elemento = Elemento(jugador_1.numero, "C2", "caballo", 0, tablero[0][6].posicion);
+		tablero[0][7].elemento = Elemento(jugador_1.numero, "T2", "torre", 0, tablero[0][7].posicion);
 
-	// Piezas principales del jugador 0
-	tablero[0][0].elemento = Elemento(jugador_1.numero, "T1", "torre", 0, tablero[0][0].posicion);
-	tablero[0][1].elemento = Elemento(jugador_1.numero, "C1", "caballo", 0, tablero[0][1].posicion);
-	tablero[0][2].elemento = Elemento(jugador_1.numero, "A1", "alfil", 0, tablero[0][2].posicion);
-	tablero[0][3].elemento = Elemento(jugador_1.numero, "R1", "rey", 0, tablero[0][3].posicion);
-	tablero[0][4].elemento = Elemento(jugador_1.numero, "D1", "dama", 0, tablero[0][4].posicion);
-	tablero[0][5].elemento = Elemento(jugador_1.numero, "A2", "alfil", 0, tablero[0][5].posicion);
-	tablero[0][6].elemento = Elemento(jugador_1.numero, "C2", "caballo", 0, tablero[0][6].posicion);
-	tablero[0][7].elemento = Elemento(jugador_1.numero, "T2", "torre", 0, tablero[0][7].posicion);
+		// Peones del jugador 1 (negras)
+		tablero[6][0].elemento = Elemento(jugador_2.numero, "PA", "peon", 0, tablero[6][0].posicion);
+		tablero[6][1].elemento = Elemento(jugador_2.numero, "PB", "peon", 0, tablero[6][1].posicion);
+		tablero[6][2].elemento = Elemento(jugador_2.numero, "PC", "peon", 0, tablero[6][2].posicion);
+		tablero[6][3].elemento = Elemento(jugador_2.numero, "PD", "peon", 0, tablero[6][3].posicion);
+		tablero[6][4].elemento = Elemento(jugador_2.numero, "PE", "peon", 0, tablero[6][4].posicion);
+		tablero[6][5].elemento = Elemento(jugador_2.numero, "PF", "peon", 0, tablero[6][5].posicion);
+		tablero[6][6].elemento = Elemento(jugador_2.numero, "PG", "peon", 0, tablero[6][6].posicion);
+		tablero[6][7].elemento = Elemento(jugador_2.numero, "PH", "peon", 0, tablero[6][7].posicion);
 
-	// Peones del jugador 1 (negras)
-	tablero[6][0].elemento = Elemento(jugador_2.numero, "PA", "peon", 0, tablero[6][0].posicion);
-	tablero[6][1].elemento = Elemento(jugador_2.numero, "PB", "peon", 0, tablero[6][1].posicion);
-	tablero[6][2].elemento = Elemento(jugador_2.numero, "PC", "peon", 0, tablero[6][2].posicion);
-	tablero[6][3].elemento = Elemento(jugador_2.numero, "PD", "peon", 0, tablero[6][3].posicion);
-	tablero[6][4].elemento = Elemento(jugador_2.numero, "PE", "peon", 0, tablero[6][4].posicion);
-	tablero[6][5].elemento = Elemento(jugador_2.numero, "PF", "peon", 0, tablero[6][5].posicion);
-	tablero[6][6].elemento = Elemento(jugador_2.numero, "PG", "peon", 0, tablero[6][6].posicion);
-	tablero[6][7].elemento = Elemento(jugador_2.numero, "PH", "peon", 0, tablero[6][7].posicion);
+		// Piezas principales del jugador 1
+		tablero[7][0].elemento = Elemento(jugador_2.numero, "TA", "torre", 0, tablero[7][0].posicion);
+		tablero[7][1].elemento = Elemento(jugador_2.numero, "CA", "caballo", 0, tablero[7][1].posicion);
+		tablero[7][2].elemento = Elemento(jugador_2.numero, "AA", "alfil", 0, tablero[7][2].posicion);
+		tablero[7][3].elemento = Elemento(jugador_2.numero, "RA", "rey", 0, tablero[7][3].posicion);
+		tablero[7][4].elemento = Elemento(jugador_2.numero, "DA", "dama", 0, tablero[7][4].posicion);
+		tablero[7][5].elemento = Elemento(jugador_2.numero, "AB", "alfil", 0, tablero[7][5].posicion);
+		tablero[7][6].elemento = Elemento(jugador_2.numero, "CB", "caballo", 0, tablero[7][6].posicion);
+		tablero[7][7].elemento = Elemento(jugador_2.numero, "TB", "torre", 0, tablero[7][7].posicion);
 
-	// Piezas principales del jugador 1
-	tablero[7][0].elemento = Elemento(jugador_2.numero, "TA", "torre", 0, tablero[7][0].posicion);
-	tablero[7][1].elemento = Elemento(jugador_2.numero, "CA", "caballo", 0, tablero[7][1].posicion);
-	tablero[7][2].elemento = Elemento(jugador_2.numero, "AA", "alfil", 0, tablero[7][2].posicion);
-	tablero[7][3].elemento = Elemento(jugador_2.numero, "RA", "rey", 0, tablero[7][3].posicion);
-	tablero[7][4].elemento = Elemento(jugador_2.numero, "DA", "dama", 0, tablero[7][4].posicion);
-	tablero[7][5].elemento = Elemento(jugador_2.numero, "AB", "alfil", 0, tablero[7][5].posicion);
-	tablero[7][6].elemento = Elemento(jugador_2.numero, "CB", "caballo", 0, tablero[7][6].posicion);
-	tablero[7][7].elemento = Elemento(jugador_2.numero, "TB", "torre", 0, tablero[7][7].posicion);
+		ofstream archivo(nombre_archivo + ".txt");
+
+		if (archivo.is_open()) {
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					Elemento elem = tablero[i][j].elemento;
+					archivo << elem.jugador << ";"
+						<< elem.nombre << ";"
+						<< elem.tipo << ";"
+						<< elem.movimientos << ";"
+						<< elem.posicion[0] << "," << elem.posicion[1] << "\n";
+				}
+			}
+			archivo << state << "\n";
+			archivo << jugador_actual.capturas << "\n";
+			archivo << jugador_actual.nombre << "\n";
+			archivo << jugador_actual.numero << "\n";
+			archivo << jugador_1.capturas << "\n";
+			archivo << jugador_1.nombre << "\n";
+			archivo << jugador_1.numero << "\n";
+			archivo << jugador_2.capturas << "\n";
+			archivo << jugador_2.nombre << "\n";
+			archivo << jugador_2.numero << "\n";
+			archivo << "NA" << "\n";
+
+			archivo.close();
+			std::cout << "Archivo creado y escrito exitosamente.\n";
+		}
+		else {
+			std::cerr << "Error al abrir el archivo.\n";
+		}
+
+	}
+	else {
+			cout << "Ingrese el nombre de la partida a cargar: " << endl;
+			cin >> nombre_archivo;
+			ifstream archivo(nombre_archivo + ".txt");
+			string linea;
+			int linea_num = 0;
+
+			if (archivo.is_open()) {
+				while (getline(archivo, linea)) {
+					linea_num++;
+					if (linea_num <= 64) {
+						// Datos de las fichas
+						stringstream ss(linea);
+						string token;
+
+						// jugador
+						getline(ss, token, ';');
+						int jugador = stoi(token);
+
+						// nombre
+						getline(ss, token, ';');
+						string nombre = token;
+
+						// tipo
+						getline(ss, token, ';');
+						string tipo = token;
+
+						// movimientos
+						getline(ss, token, ';');
+						int movimientos = stoi(token);
+
+						// posicion (fila,columna)
+						getline(ss, token); // "fila,columna"
+						stringstream posStream(token);
+						string parte;
+						getline(posStream, parte, ',');
+						int fila = stoi(parte);
+						getline(posStream, parte, ',');
+						int columna = stoi(parte);
+
+						// Crear y asignar ficha al tablero
+						tablero[fila][columna].elemento = Elemento(jugador, nombre, tipo, movimientos, { fila, columna });
+					}
+					else if (linea_num == 65) state = linea;
+					else if (linea_num == 66) jugador_actual.capturas = linea;
+					else if (linea_num == 67) jugador_actual.nombre = linea;
+					else if (linea_num == 68) jugador_actual.numero = stoi(linea);
+					else if (linea_num == 69) jugador_1.capturas = linea;
+					else if (linea_num == 70) jugador_1.nombre = linea;
+					else if (linea_num == 71) jugador_1.numero = stoi(linea);
+					else if (linea_num == 72) jugador_2.capturas = linea;
+					else if (linea_num == 73) jugador_2.nombre = linea;
+					else if (linea_num == 74) jugador_2.numero = stoi(linea);
+					else if (linea_num == 75) winner = linea;
+				}
+			}
+			archivo.close();
+	}
+
+
 
 	while (true)
 	{
@@ -158,13 +274,13 @@ int main()
 
 		cout << endl << "Capturas: " << endl;
 		switch (jugador_actual.numero) {
-		case 0: 
+		case 0:
 			cout << jugador_1.capturas << endl;
 			break;
 		case 1:
 			cout << jugador_2.capturas << endl;
 		}
-		
+
 
 		int init_i, init_j, final_i, final_j;
 
@@ -296,7 +412,7 @@ int main()
 					}
 				}
 
-				else if (tablero[init_i][init_j].elemento.tipo == "peon"){
+				else if (tablero[init_i][init_j].elemento.tipo == "peon") {
 					if (columnas_movidas == 0 && filas_movidas == 1) {
 						cout << "Movimiento vertical unitario" << endl;
 					}
@@ -374,12 +490,11 @@ int main()
 		}
 		if (tablero[final_i][final_j].elemento.jugador != -1 && tablero[final_i][final_j].elemento.tipo != "rey")
 		{
-			capturas_totales += tablero[init_i][init_j].elemento.nombre + "->" + tablero[final_i][final_j].elemento.nombre + "\n";
 			if (jugador_actual.numero == 0) {
-				jugador_1.capturas += tablero[init_i][init_j].elemento.nombre + "->" + tablero[final_i][final_j].elemento.nombre + "\n";
+				jugador_1.capturas += tablero[init_i][init_j].elemento.nombre + "->" + tablero[final_i][final_j].elemento.nombre + ";";
 			}
 			else {
-				jugador_2.capturas += tablero[init_i][init_j].elemento.nombre + "->" + tablero[final_i][final_j].elemento.nombre + "\n";
+				jugador_2.capturas += tablero[init_i][init_j].elemento.nombre + "->" + tablero[final_i][final_j].elemento.nombre + ";";
 			}
 		}
 
@@ -387,15 +502,59 @@ int main()
 		{
 			if (tablero[final_i][final_j].elemento.tipo == "rey") {
 				cout << "Jaque mate!" << endl;
-				cout << "Capturas" << endl;
-				cout << capturas_totales << endl;
+
+				if (jugador_actual.numero == 0) {
+					jugador_1.capturas += tablero[init_i][init_j].elemento.nombre + "->" + tablero[final_i][final_j].elemento.nombre + ";";
+				}
+				else {
+					jugador_2.capturas += tablero[init_i][init_j].elemento.nombre + "->" + tablero[final_i][final_j].elemento.nombre + ";";
+				}
+
+				tablero[init_i][init_j].elemento.movimientos++;
+				tablero[init_i][init_j].elemento.posicion = tablero[final_i][final_j].posicion;
+				tablero[final_i][final_j].elemento = tablero[init_i][init_j].elemento;
+				tablero[init_i][init_j].elemento = Elemento(-1, "  ", "casilla", -1, { init_i, init_j });
+
+				state = "finished";
+
+				ofstream archivo(nombre_archivo + ".txt");
+
+				if (archivo.is_open()) {
+					for (int i = 0; i < 8; i++) {
+						for (int j = 0; j < 8; j++) {
+							Elemento elem = tablero[i][j].elemento;
+							archivo << elem.jugador << ";"
+								<< elem.nombre << ";"
+								<< elem.tipo << ";"
+								<< elem.movimientos << ";"
+								<< elem.posicion[0] << "," << elem.posicion[1] << "\n";
+						}
+					}
+					archivo << state << "\n";
+					archivo << jugador_actual.capturas << "\n";
+					archivo << jugador_actual.nombre << "\n";
+					archivo << jugador_actual.numero << "\n";
+					archivo << jugador_1.capturas << "\n";
+					archivo << jugador_1.nombre << "\n";
+					archivo << jugador_1.numero << "\n";
+					archivo << jugador_2.capturas << "\n";
+					archivo << jugador_2.nombre << "\n";
+					archivo << jugador_2.numero << "\n";
+					archivo.close();
+					std::cout << "Archivo creado y escrito exitosamente.\n";
+				}
+				else {
+					std::cerr << "Error al abrir el archivo.\n";
+				}
+
 				return 0;
 			}
 		}
 		tablero[init_i][init_j].elemento.movimientos++;
-		tablero[init_i][init_j].elemento.posicion = { final_i, final_j };
+		tablero[init_i][init_j].elemento.posicion = tablero[final_i][final_j].posicion;
 		tablero[final_i][final_j].elemento = tablero[init_i][init_j].elemento;
 		tablero[init_i][init_j].elemento = Elemento(-1, "  ", "casilla", -1, { init_i, init_j });
+
 		if (jugador_actual.numero == 0)
 		{
 			jugador_actual = jugador_2;
@@ -404,6 +563,42 @@ int main()
 		{
 			jugador_actual = jugador_1;
 		}
+		cout << "Continuar?" << endl;
+		cin >> answer;
+		if (answer == "n") {
+			ofstream archivo(nombre_archivo+".txt");
+
+			if (archivo.is_open()) {
+				for (int i = 0; i < 8; i++) {
+					for (int j = 0; j < 8; j++) {
+						Elemento elem = tablero[i][j].elemento;
+						archivo << elem.jugador << ";"
+							<< elem.nombre << ";"
+							<< elem.tipo << ";"
+							<< elem.movimientos << ";"
+							<< elem.posicion[0] << "," << elem.posicion[1] << "\n";
+					}
+				}
+				archivo << state << "\n";
+				archivo << jugador_actual.capturas << "\n";
+				archivo << jugador_actual.nombre << "\n";
+				archivo << jugador_actual.numero << "\n";
+				archivo << jugador_1.capturas << "\n";
+				archivo << jugador_1.nombre << "\n";
+				archivo << jugador_1.numero << "\n";
+				archivo << jugador_2.capturas << "\n";
+				archivo << jugador_2.nombre << "\n";
+				archivo << jugador_2.numero << "\n";
+				archivo << "NA" << "\n";
+				archivo.close();
+				std::cout << "Archivo creado y escrito exitosamente.\n";
+			}
+			else {
+				std::cerr << "Error al abrir el archivo.\n";
+			}
+			return 0;
+		}
+
 		system("cls");
 	}
 	return 0;
