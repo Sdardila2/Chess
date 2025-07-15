@@ -5,7 +5,6 @@
 #include <cstdlib> 
 #include <vector>
 
-
 using namespace std;
 
 
@@ -67,17 +66,15 @@ public:
 
 int main()
 {
-	string answer;
-	string winner;
-	string state = "active";
-	string nombre_archivo;
 	int filas_movidas;
 	int columnas_movidas;
+	string respuesta;
+	string ganador;
+	string estado = "active";
+	string nombre_archivo;
 	Jugador jugador_actual;
 	Jugador jugador_1;
-	jugador_1 = Jugador("", "", 0);
 	Jugador jugador_2;
-	jugador_2 = Jugador("", "", 1);
 	Casilla tablero[8][8];
 
 	for (int i = 0; i <= 8 - 1; i++)
@@ -87,11 +84,13 @@ int main()
 			tablero[i][j] = Casilla({ i, j }, Elemento(-1, "  ", "vacio", -1, { i, j }));
 		}
 	}
-	
+
 	int op;
 	cout << "Desea crear una nueva partida o cargar una? (0 = nueva, 1 = cargar partida): " << endl;
 	cin >> op;
 	if (op == 0) {
+		jugador_1 = Jugador("", "", 0);
+		jugador_2 = Jugador("", "", 1);
 		cout << "Ingrese el nombre de su nueva partida: " << endl;
 		cin >> nombre_archivo;
 		cout << "Ingrese el nombre del jugador 0: " << endl;
@@ -99,7 +98,7 @@ int main()
 		cout << "Ingrese el nombre del jugador 1: " << endl;
 		cin >> jugador_2.nombre;
 		jugador_actual = jugador_1;
-		
+
 		// Peones del jugador 0 (blancas)
 		tablero[1][0].elemento = Elemento(jugador_1.numero, "P1", "peon", 0, tablero[1][0].posicion);
 		tablero[1][1].elemento = Elemento(jugador_1.numero, "P2", "peon", 0, tablero[1][1].posicion);
@@ -153,7 +152,7 @@ int main()
 						<< elem.posicion[0] << "," << elem.posicion[1] << "\n";
 				}
 			}
-			archivo << state << "\n";
+			archivo << estado << "\n";
 			archivo << jugador_actual.capturas << "\n";
 			archivo << jugador_actual.nombre << "\n";
 			archivo << jugador_actual.numero << "\n";
@@ -164,75 +163,102 @@ int main()
 			archivo << jugador_2.nombre << "\n";
 			archivo << jugador_2.numero << "\n";
 			archivo << "NA" << "\n";
-
 			archivo.close();
-			std::cout << "Archivo creado y escrito exitosamente.\n";
+			cout << "Archivo creado y escrito exitosamente.\n";
 		}
 		else {
-			std::cerr << "Error al abrir el archivo.\n";
+			cerr << "Error al abrir el archivo.\n";
 		}
 
 	}
 	else {
-			cout << "Ingrese el nombre de la partida a cargar: " << endl;
-			cin >> nombre_archivo;
-			ifstream archivo(nombre_archivo + ".txt");
-			string linea;
-			int linea_num = 0;
+		cout << "Ingrese el nombre de la partida a cargar: " << endl;
+		cin >> nombre_archivo;
+		ifstream archivo(nombre_archivo + ".txt");
+		string linea;
+		int linea_num = 0;
 
-			if (archivo.is_open()) {
-				while (getline(archivo, linea)) {
-					linea_num++;
-					if (linea_num <= 64) {
-						// Datos de las fichas
-						stringstream ss(linea);
-						string token;
+		if (archivo.is_open()) {
+			while (getline(archivo, linea)) {
+				linea_num++;
+				if (linea_num <= 64) {
+					// Datos de las fichas
+					stringstream ss(linea);
+					string token;
 
-						// jugador
-						getline(ss, token, ';');
-						int jugador = stoi(token);
+					// jugador
+					getline(ss, token, ';');
+					int jugador = stoi(token);
 
-						// nombre
-						getline(ss, token, ';');
-						string nombre = token;
+					// nombre
+					getline(ss, token, ';');
+					string nombre = token;
 
-						// tipo
-						getline(ss, token, ';');
-						string tipo = token;
+					// tipo
+					getline(ss, token, ';');
+					string tipo = token;
 
-						// movimientos
-						getline(ss, token, ';');
-						int movimientos = stoi(token);
+					// movimientos
+					getline(ss, token, ';');
+					int movimientos = stoi(token);
 
-						// posicion (fila,columna)
-						getline(ss, token); // "fila,columna"
-						stringstream posStream(token);
-						string parte;
-						getline(posStream, parte, ',');
-						int fila = stoi(parte);
-						getline(posStream, parte, ',');
-						int columna = stoi(parte);
+					// posicion (fila,columna)
+					getline(ss, token); // "fila,columna"
+					stringstream posStream(token);
+					string parte;
+					getline(posStream, parte, ',');
+					int fila = stoi(parte);
+					getline(posStream, parte, ',');
+					int columna = stoi(parte);
 
-						// Crear y asignar ficha al tablero
-						tablero[fila][columna].elemento = Elemento(jugador, nombre, tipo, movimientos, { fila, columna });
-					}
-					else if (linea_num == 65) state = linea;
-					else if (linea_num == 66) jugador_actual.capturas = linea;
-					else if (linea_num == 67) jugador_actual.nombre = linea;
-					else if (linea_num == 68) jugador_actual.numero = stoi(linea);
-					else if (linea_num == 69) jugador_1.capturas = linea;
-					else if (linea_num == 70) jugador_1.nombre = linea;
-					else if (linea_num == 71) jugador_1.numero = stoi(linea);
-					else if (linea_num == 72) jugador_2.capturas = linea;
-					else if (linea_num == 73) jugador_2.nombre = linea;
-					else if (linea_num == 74) jugador_2.numero = stoi(linea);
-					else if (linea_num == 75) winner = linea;
+					// Crear y asignar ficha al tablero
+					tablero[fila][columna].elemento = Elemento(jugador, nombre, tipo, movimientos, { fila, columna });
 				}
+				else if (linea_num == 65) estado = linea;
+				else if (linea_num == 66) jugador_actual.capturas = linea;
+				else if (linea_num == 67) jugador_actual.nombre = linea;
+				else if (linea_num == 68) jugador_actual.numero = stoi(linea);
+				else if (linea_num == 69) jugador_1.capturas = linea;
+				else if (linea_num == 70) jugador_1.nombre = linea;
+				else if (linea_num == 71) jugador_1.numero = stoi(linea);
+				else if (linea_num == 72) jugador_2.capturas = linea;
+				else if (linea_num == 73) jugador_2.nombre = linea;
+				else if (linea_num == 74) jugador_2.numero = stoi(linea);
+				else if (linea_num == 75) ganador = linea;
+
 			}
 			archivo.close();
+		}
 	}
 
+	if (estado == "finished") {
+		cout << "Este juego ya finalizó, te mostraremos solo el resultado final del tablero y los movimientos de cada jugador." << endl;
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				bool casillaClara = (i + j) % 2 == 0;
 
+				string fondo = casillaClara ? "\033[47m" : "\033[43m";  // Blanco o marrón (amarillo oscuro)
+				string texto = casillaClara ? "\033[30m" : "\033[30m";  // Texto negro en ambos casos
+				string reset = "\033[0m";
+
+				string nombre = tablero[i][j].elemento.nombre;
+
+				if (nombre.empty()) {
+					cout << fondo << texto << "  " << reset;
+				}
+				else {
+					if (nombre.length() == 1) nombre = " " + nombre;
+					cout << fondo << texto << nombre << reset;
+				}
+			}
+			cout << endl;
+		}
+
+		cout << "Capturas jugador 1: " << jugador_1.capturas << endl;
+		cout << "Capturas jugador 2: " << jugador_2.capturas << endl;
+
+		return 0;
+	}
 
 	while (true)
 	{
@@ -517,7 +543,7 @@ int main()
 				tablero[final_i][final_j].elemento = tablero[init_i][init_j].elemento;
 				tablero[init_i][init_j].elemento = Elemento(-1, "  ", "casilla", -1, { init_i, init_j });
 
-				state = "finished";
+				estado = "finished";
 
 				ofstream archivo(nombre_archivo + ".txt");
 
@@ -532,7 +558,7 @@ int main()
 								<< elem.posicion[0] << "," << elem.posicion[1] << "\n";
 						}
 					}
-					archivo << state << "\n";
+					archivo << estado << "\n";
 					archivo << jugador_actual.capturas << "\n";
 					archivo << jugador_actual.nombre << "\n";
 					archivo << jugador_actual.numero << "\n";
@@ -542,16 +568,25 @@ int main()
 					archivo << jugador_2.capturas << "\n";
 					archivo << jugador_2.nombre << "\n";
 					archivo << jugador_2.numero << "\n";
+					archivo << jugador_actual.nombre << "\n";
 					archivo.close();
-					std::cout << "Archivo creado y escrito exitosamente.\n";
+					cout << "Archivo creado y escrito exitosamente.\n";
 				}
 				else {
-					std::cerr << "Error al abrir el archivo.\n";
+					cerr << "Error al abrir el archivo.\n";
 				}
 
 				return 0;
 			}
 		}
+
+		if (jugador_actual.numero == 0) {
+			jugador_1.capturas += tablero[init_i][init_j].elemento.nombre + "->" + tablero[final_i][final_j].elemento.nombre + ";";
+		}
+		else {
+			jugador_2.capturas += tablero[init_i][init_j].elemento.nombre + "->" + tablero[final_i][final_j].elemento.nombre + ";";
+		}
+
 		tablero[init_i][init_j].elemento.movimientos++;
 		tablero[init_i][init_j].elemento.posicion = tablero[final_i][final_j].posicion;
 		tablero[final_i][final_j].elemento = tablero[init_i][init_j].elemento;
@@ -566,9 +601,9 @@ int main()
 			jugador_actual = jugador_1;
 		}
 		cout << "Continuar?" << endl;
-		cin >> answer;
-		if (answer == "n") {
-			ofstream archivo(nombre_archivo+".txt");
+		cin >> respuesta;
+		if (respuesta == "n") {
+			ofstream archivo(nombre_archivo + ".txt");
 
 			if (archivo.is_open()) {
 				for (int i = 0; i < 8; i++) {
@@ -581,7 +616,7 @@ int main()
 							<< elem.posicion[0] << "," << elem.posicion[1] << "\n";
 					}
 				}
-				archivo << state << "\n";
+				archivo << estado << "\n";
 				archivo << jugador_actual.capturas << "\n";
 				archivo << jugador_actual.nombre << "\n";
 				archivo << jugador_actual.numero << "\n";
@@ -593,10 +628,10 @@ int main()
 				archivo << jugador_2.numero << "\n";
 				archivo << "NA" << "\n";
 				archivo.close();
-				std::cout << "Archivo creado y escrito exitosamente.\n";
+				cout << "Archivo creado y escrito exitosamente.\n";
 			}
 			else {
-				std::cerr << "Error al abrir el archivo.\n";
+				cerr << "Error al abrir el archivo.\n";
 			}
 			return 0;
 		}

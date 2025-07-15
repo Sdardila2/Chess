@@ -1,7 +1,7 @@
 -1;  ;casilla;-1;0,0
 0;C1;caballo;0;0,1
 0;A1;alfil;0;0,2
-0;R1;rey;0;0,3
+1;PA;peon;1;0,3
 0;D1;dama;0;0,4
 0;A2;alfil;0;0,5
 0;C2;caballo;0;0,6
@@ -46,7 +46,7 @@
 -1;  ;vacio;-1;5,5
 -1;  ;vacio;-1;5,6
 -1;  ;vacio;-1;5,7
-1;PA;peon;0;6,0
+-1;  ;casilla;-1;6,0
 1;PB;peon;0;6,1
 1;PC;peon;0;6,2
 1;PD;peon;0;6,3
@@ -62,14 +62,14 @@
 1;AB;alfil;0;7,5
 1;CB;caballo;0;7,6
 1;TB;torre;0;7,7
-active
+finished
 
 456
 1
-T1->TA;
-123
+T1->TA;T1->TA;
+456
 0
-
+PA->R1;
 456
 1
-NA
+456
