@@ -78,7 +78,9 @@ int main()
 	string ruta_guardado = (newDirectoryPath / "").string();
 	filesystem::create_directory(newDirectoryPath);
 
+
 	//gittest
+
 
 	int movimientos = 0;
 	int filas_movidas;

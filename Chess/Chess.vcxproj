@@ -73,8 +73,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryWPath>$(LibraryWPath)</LibraryWPath>
-    <IncludePath>C:\Users\Samuel\Desktop\Chess\SFML\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Samuel\Desktop\Chess\SFML\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Samuel\Downloads\SFML\SFML-3.0.0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Samuel\Downloads\SFML\SFML-3.0.0\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
