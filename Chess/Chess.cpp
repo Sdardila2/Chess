@@ -5,6 +5,9 @@
 #include <cstdlib> 
 #include <vector>
 #include <list>
+#include <filesystem>
+#include <direct.h>
+
 
 using namespace std;
 
@@ -70,6 +73,30 @@ public:
 
 int main()
 {
+	char* appdata = getenv("APPDATA");
+
+	if (appdata == nullptr) {
+		cerr << "No se pudo obtener la variable de entorno APPDATA." << endl;
+		return 0;
+	}
+
+	filesystem::path newDirectoryPath = filesystem::path(appdata) / "Chess";
+	string ruta_guardado = (newDirectoryPath / "").string();
+
+	try {
+		if (filesystem::create_directory(newDirectoryPath)) {
+			cout << "Directory '" << newDirectoryPath << "' created successfully." << endl;
+		}
+		else {
+			cout << "Directory '" << newDirectoryPath << "' already exists or could not be created." << endl;
+		}
+	}
+	catch (const filesystem::filesystem_error& e) {
+		cerr << "Error creating directory: " << e.what() << endl;
+	}
+
+
+
 
 	int movimientos = 0;
 	int filas_movidas;
@@ -146,7 +173,7 @@ int main()
 		tablero[7][6].elemento = Elemento(jugador_2.numero, "CB", "caballo", 0, tablero[7][6].posicion);
 		tablero[7][7].elemento = Elemento(jugador_2.numero, "TB", "torre", 0, tablero[7][7].posicion);
 
-		ofstream archivo(nombre_archivo + ".txt");
+		ofstream archivo(ruta_guardado + nombre_archivo + ".txt");
 
 		if (archivo.is_open()) {
 			for (int i = 0; i < 8; i++) {
@@ -193,7 +220,7 @@ int main()
 
 		cout << "Ingrese el nombre de la partida a cargar: " << endl;
 		cin >> nombre_archivo;
-		ifstream archivo(nombre_archivo + ".txt");
+		ifstream archivo(ruta_guardado + nombre_archivo + ".txt");
 		string linea;
 		int linea_num = 0;
 
@@ -618,7 +645,7 @@ int main()
 			break;
 		}
 
-		string movement = tablero[init_i][init_j].elemento.nombre + ":{" + to_string(init_i) + ',' + to_string(init_j) + "}->{" + to_string(final_i) + "," + to_string(final_j) + "}" + " ("+jugador_actual.nombre+")";
+		string movement = tablero[init_i][init_j].elemento.nombre + ":{" + to_string(init_i) + ',' + to_string(init_j) + "}->{" + to_string(final_i) + "," + to_string(final_j) + "}" + " (" + jugador_actual.nombre + ")";
 		// cout << movement << endl;
 
 		if (tablero[final_i][final_j].elemento.jugador != -1 && tablero[final_i][final_j].elemento.tipo != "rey")
@@ -665,7 +692,7 @@ int main()
 
 				estado = "finished";
 
-				ofstream archivo(nombre_archivo + ".txt");
+				ofstream archivo(ruta_guardado + nombre_archivo + ".txt");
 
 				if (archivo.is_open()) {
 					for (int i = 0; i < 8; i++) {
@@ -744,7 +771,7 @@ int main()
 		cout << "Continuar?" << endl;
 		cin >> respuesta;
 		if (respuesta == "n") {
-			ofstream archivo(nombre_archivo + ".txt");
+			ofstream archivo(ruta_guardado + nombre_archivo + ".txt");
 
 			if (archivo.is_open()) {
 				for (int i = 0; i < 8; i++) {
