@@ -6,6 +6,7 @@
 #include <vector>
 #include <list>
 #include <filesystem>
+#include <SFML/Graphics.hpp>
 
 
 using namespace std;
