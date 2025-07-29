@@ -70,13 +70,15 @@ public:
 
 int main()
 {
-	int movimientos = 1;
+
+	int movimientos = 0;
 	int filas_movidas;
 	int columnas_movidas;
 	string respuesta;
 	string ganador;
 	string estado = "active";
 	string nombre_archivo;
+	vector<string> movimientos_totales = {};
 	Jugador jugador_actual;
 	Jugador jugador_1;
 	Jugador jugador_2;
@@ -144,18 +146,6 @@ int main()
 		tablero[7][6].elemento = Elemento(jugador_2.numero, "CB", "caballo", 0, tablero[7][6].posicion);
 		tablero[7][7].elemento = Elemento(jugador_2.numero, "TB", "torre", 0, tablero[7][7].posicion);
 
-		for (int i = 0; i < 8; i++) {
-			for (int j = 0; j < 8; j++) {
-				string evento = to_string(tablero[i][j].elemento.jugador) + ";" +
-					tablero[i][j].elemento.nombre + ";" +
-					tablero[i][j].elemento.tipo + ";" +
-					to_string(tablero[i][j].elemento.movimientos) + ";" +
-					to_string(tablero[i][j].elemento.posicion[0]) + "," +
-					to_string(tablero[i][j].elemento.posicion[1]);
-				tablero[i][j].historial.push_back(evento);
-			}
-		}
-
 		ofstream archivo(nombre_archivo + ".txt");
 
 		if (archivo.is_open()) {
@@ -190,7 +180,7 @@ int main()
 
 	}
 	else {
-		cout << "Tablero antes de ser registrado:" << endl;
+		/*cout << "Tablero antes de ser registrado:" << endl;
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
 				cout << i << ", " << j << endl;
@@ -199,7 +189,7 @@ int main()
 				}
 				cout << endl;
 			}
-		}
+		}*/
 
 		cout << "Ingrese el nombre de la partida a cargar: " << endl;
 		cin >> nombre_archivo;
@@ -257,18 +247,15 @@ int main()
 				else if (linea_num == 74) jugador_2.numero = stoi(linea);
 				else if (linea_num == 75) ganador = linea;
 				else if (linea_num == 76) movimientos = stoi(linea);
-				else{
-					cout << linea_num - 76 << endl;
+				else if (linea_num <= 140) {
+					//cout << linea_num - 76 << endl;
 					stringstream ss2(linea);
 					string temporal;
 					char delimitador = '/';
 					while (getline(ss2, temporal, delimitador)) {
-						cout << "\"" << temporal << "\"" << " " << endl;
+						//cout << "\"" << temporal << "\"" << " " << endl;
 
 						tablero[i][j].historial.push_back(temporal);
-
-
-
 					}
 
 					j++;
@@ -276,13 +263,14 @@ int main()
 						j = 0;
 						i++;
 					}
-
-					cout << endl;
+				}
+				else {
+					movimientos_totales.push_back(linea);
 				}
 			}
 			archivo.close();
 		}
-		for (int i = 0; i < 8; i++) {
+		/*for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
 				cout << i << ", " << j << endl;
 				for (string elemento : tablero[i][j].historial) {
@@ -291,10 +279,17 @@ int main()
 				cout << endl;
 			}
 		}
+		*/
 		cout << endl;
+
+		cout << "Historial de jugadas: " << endl;
 		cout << endl;
+
 		int contador = 0;
 		while (contador < movimientos) {
+			cout << "Movimiento " << contador + 1 << endl;
+			cout << movimientos_totales[contador] << endl;
+
 			for (int i = 0; i < 8; i++) {
 				for (int j = 0; j < 8; j++) {
 					stringstream aux(tablero[i][j].historial[contador]);
@@ -323,12 +318,12 @@ int main()
 			contador++;
 			cout << endl;
 		}
-		
+
 
 	}
 
 	if (estado == "finished") {
-		cout << "Este juego ya finalizó, te mostraremos solo el resultado final del tablero y los movimientos de cada jugador." << endl;
+		cout << "Este juego ya finalizó, te mostraremos el resultado final del tablero y los movimientos de cada jugador." << endl;
 		cout << "Resultado final: " << endl;
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
@@ -356,8 +351,13 @@ int main()
 
 
 		cout << "Movimientos totales: " << movimientos << endl;
-		cout << "Capturas jugador 1: " << jugador_1.capturas << endl;
-		cout << "Capturas jugador 2: " << jugador_2.capturas << endl;
+		cout << "Capturas " << jugador_1.nombre << ": " << jugador_1.capturas << endl;
+		cout << "Capturas " << jugador_2.nombre << ": " << jugador_2.capturas << endl;
+		cout << "Lista de movimientos" << endl;
+		for (string elemento : movimientos_totales) {
+			cout << elemento << endl;
+		}
+		cout << "Ganador: " << ganador << endl;
 
 
 		return 0;
@@ -388,8 +388,6 @@ int main()
 			cout << endl;
 		}
 
-
-
 		cout << "Elementos y posiciones disponibles:" << endl;
 
 		for (int i = 0; i <= 8 - 1; i++)
@@ -401,7 +399,6 @@ int main()
 					cout << tablero[i][j].posicion[0] << tablero[i][j].posicion[1] << ":" << tablero[i][j].elemento.nombre << endl;
 				}
 			}
-
 		}
 
 		cout << endl << "Capturas: " << endl;
@@ -620,6 +617,10 @@ int main()
 			}
 			break;
 		}
+
+		string movement = tablero[init_i][init_j].elemento.nombre + ":{" + to_string(init_i) + ',' + to_string(init_j) + "}->{" + to_string(final_i) + "," + to_string(final_j) + "}" + " ("+jugador_actual.nombre+")";
+		// cout << movement << endl;
+
 		if (tablero[final_i][final_j].elemento.jugador != -1 && tablero[final_i][final_j].elemento.tipo != "rey")
 		{
 			if (jugador_actual.numero == 0) {
@@ -635,6 +636,9 @@ int main()
 			if (tablero[final_i][final_j].elemento.tipo == "rey") {
 				cout << "Jaque mate!" << endl;
 
+				movimientos++;
+				movimientos_totales.push_back(movement);
+
 				if (jugador_actual.numero == 0) {
 					jugador_1.capturas += tablero[init_i][init_j].elemento.nombre + "->" + tablero[final_i][final_j].elemento.nombre + ";";
 				}
@@ -646,6 +650,18 @@ int main()
 				tablero[init_i][init_j].elemento.posicion = tablero[final_i][final_j].posicion;
 				tablero[final_i][final_j].elemento = tablero[init_i][init_j].elemento;
 				tablero[init_i][init_j].elemento = Elemento(-1, "  ", "casilla", -1, { init_i, init_j });
+
+				for (int i = 0; i < 8; i++) {
+					for (int j = 0; j < 8; j++) {
+						string evento = to_string(tablero[i][j].elemento.jugador) + ";" +
+							tablero[i][j].elemento.nombre + ";" +
+							tablero[i][j].elemento.tipo + ";" +
+							to_string(tablero[i][j].elemento.movimientos) + ";" +
+							to_string(tablero[i][j].elemento.posicion[0]) + "," +
+							to_string(tablero[i][j].elemento.posicion[1]);
+						tablero[i][j].historial.push_back(evento);
+					}
+				}
 
 				estado = "finished";
 
@@ -681,6 +697,9 @@ int main()
 							}
 							archivo << "\n";
 						}
+					}
+					for (string elemento : movimientos_totales) {
+						archivo << elemento << "\n";
 					}
 					archivo.close();
 					cout << "Archivo creado y escrito exitosamente.\n";
@@ -720,6 +739,8 @@ int main()
 			}
 		}
 
+		movimientos_totales.push_back(movement);
+
 		cout << "Continuar?" << endl;
 		cin >> respuesta;
 		if (respuesta == "n") {
@@ -757,6 +778,9 @@ int main()
 						}
 						archivo << "\n";
 					}
+				}
+				for (string elemento : movimientos_totales) {
+					archivo << elemento << "\n";
 				}
 				archivo.close();
 
