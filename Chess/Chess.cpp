@@ -6,7 +6,6 @@
 #include <vector>
 #include <list>
 #include <filesystem>
-#include <direct.h>
 
 
 using namespace std;
@@ -73,30 +72,10 @@ public:
 
 int main()
 {
-	char* appdata = getenv("APPDATA");
 
-	if (appdata == nullptr) {
-		cerr << "No se pudo obtener la variable de entorno APPDATA." << endl;
-		return 0;
-	}
-
-	filesystem::path newDirectoryPath = filesystem::path(appdata) / "Chess";
+	filesystem::path newDirectoryPath = filesystem::path(getenv("APPDATA")) / "Chess";
 	string ruta_guardado = (newDirectoryPath / "").string();
-
-	try {
-		if (filesystem::create_directory(newDirectoryPath)) {
-			cout << "Directory '" << newDirectoryPath << "' created successfully." << endl;
-		}
-		else {
-			cout << "Directory '" << newDirectoryPath << "' already exists or could not be created." << endl;
-		}
-	}
-	catch (const filesystem::filesystem_error& e) {
-		cerr << "Error creating directory: " << e.what() << endl;
-	}
-
-
-
+	filesystem::create_directory(newDirectoryPath);
 
 	int movimientos = 0;
 	int filas_movidas;
