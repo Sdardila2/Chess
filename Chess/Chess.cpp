@@ -4,9 +4,9 @@
 #include <fstream>
 #include <cstdlib> 
 #include <vector>
+#include <list>
 
 using namespace std;
-
 
 class Elemento
 {
@@ -34,11 +34,14 @@ class Casilla
 public:
 	vector <int> posicion;
 	Elemento elemento;
+	list <string> historial;
+	list <Casilla> historial2;
 	Casilla() {
 	}
-	Casilla(vector <int> v, Elemento e) {
+	Casilla(vector <int> v, Elemento e, list <string> h) {
 		posicion = v;
 		elemento = e;
+		historial = h;
 	}
 };
 
@@ -66,6 +69,7 @@ public:
 
 int main()
 {
+	int movimientos = 1;
 	int filas_movidas;
 	int columnas_movidas;
 	string respuesta;
@@ -81,7 +85,7 @@ int main()
 	{
 		for (int j = 0; j <= 8 - 1; j++)
 		{
-			tablero[i][j] = Casilla({ i, j }, Elemento(-1, "  ", "vacio", -1, { i, j }));
+			tablero[i][j] = Casilla({ i, j }, Elemento(-1, "  ", "vacio", -1, { i, j }), {});
 		}
 	}
 
@@ -139,6 +143,18 @@ int main()
 		tablero[7][6].elemento = Elemento(jugador_2.numero, "CB", "caballo", 0, tablero[7][6].posicion);
 		tablero[7][7].elemento = Elemento(jugador_2.numero, "TB", "torre", 0, tablero[7][7].posicion);
 
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				string evento = to_string(tablero[i][j].elemento.jugador) + ";" +
+					tablero[i][j].elemento.nombre + ";" +
+					tablero[i][j].elemento.tipo + ";" +
+					to_string(tablero[i][j].elemento.movimientos) + ";" +
+					to_string(tablero[i][j].elemento.posicion[0]) + "," +
+					to_string(tablero[i][j].elemento.posicion[1]);
+				tablero[i][j].historial.push_back(evento);
+			}
+		}
+
 		ofstream archivo(nombre_archivo + ".txt");
 
 		if (archivo.is_open()) {
@@ -163,6 +179,7 @@ int main()
 			archivo << jugador_2.nombre << "\n";
 			archivo << jugador_2.numero << "\n";
 			archivo << "NA" << "\n";
+			archivo << movimientos << "\n";
 			archivo.close();
 			cout << "Archivo creado y escrito exitosamente.\n";
 		}
@@ -183,32 +200,32 @@ int main()
 				linea_num++;
 				if (linea_num <= 64) {
 					// Datos de las fichas
-					stringstream ss(linea);
+					stringstream linea_externa(linea);
 					string token;
 
 					// jugador
-					getline(ss, token, ';');
+					getline(linea_externa, token, ';');
 					int jugador = stoi(token);
 
 					// nombre
-					getline(ss, token, ';');
+					getline(linea_externa, token, ';');
 					string nombre = token;
 
 					// tipo
-					getline(ss, token, ';');
+					getline(linea_externa, token, ';');
 					string tipo = token;
 
 					// movimientos
-					getline(ss, token, ';');
+					getline(linea_externa, token, ';');
 					int movimientos = stoi(token);
 
 					// posicion (fila,columna)
-					getline(ss, token); // "fila,columna"
-					stringstream posStream(token);
+					getline(linea_externa, token); // "fila,columna"
+					stringstream linea_interna(token);
 					string parte;
-					getline(posStream, parte, ',');
+					getline(linea_interna, parte, ',');
 					int fila = stoi(parte);
-					getline(posStream, parte, ',');
+					getline(linea_interna, parte, ',');
 					int columna = stoi(parte);
 
 					// Crear y asignar ficha al tablero
@@ -225,7 +242,7 @@ int main()
 				else if (linea_num == 73) jugador_2.nombre = linea;
 				else if (linea_num == 74) jugador_2.numero = stoi(linea);
 				else if (linea_num == 75) ganador = linea;
-
+				else if (linea_num == 76) movimientos = stoi(linea);
 			}
 			archivo.close();
 		}
@@ -254,15 +271,18 @@ int main()
 			cout << endl;
 		}
 
+		cout << "Movimientos totales: " << movimientos << endl;
 		cout << "Capturas jugador 1: " << jugador_1.capturas << endl;
 		cout << "Capturas jugador 2: " << jugador_2.capturas << endl;
+
 
 		return 0;
 	}
 
 	while (true)
 	{
-		cout << "Turno jugador " << jugador_actual.nombre << endl << endl;
+		cout << "Movimiento actual: " << movimientos << endl;
+		cout << "Jugador actual: " << jugador_actual.nombre << endl;
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
 				bool casillaClara = (i + j) % 2 == 0;
@@ -569,6 +589,15 @@ int main()
 					archivo << jugador_2.nombre << "\n";
 					archivo << jugador_2.numero << "\n";
 					archivo << jugador_actual.nombre << "\n";
+					archivo << movimientos << "\n";
+					for (int i = 0; i < 8; i++) {
+						for (int j = 0; j < 8; j++) {
+							for (const string& jugada : tablero[i][j].historial) {
+								archivo << jugada << "/";
+							}
+							archivo << "\n";
+						}
+					}
 					archivo.close();
 					cout << "Archivo creado y escrito exitosamente.\n";
 				}
@@ -580,13 +609,7 @@ int main()
 			}
 		}
 
-		if (jugador_actual.numero == 0) {
-			jugador_1.capturas += tablero[init_i][init_j].elemento.nombre + "->" + tablero[final_i][final_j].elemento.nombre + ";";
-		}
-		else {
-			jugador_2.capturas += tablero[init_i][init_j].elemento.nombre + "->" + tablero[final_i][final_j].elemento.nombre + ";";
-		}
-
+		movimientos++;
 		tablero[init_i][init_j].elemento.movimientos++;
 		tablero[init_i][init_j].elemento.posicion = tablero[final_i][final_j].posicion;
 		tablero[final_i][final_j].elemento = tablero[init_i][init_j].elemento;
@@ -600,6 +623,19 @@ int main()
 		{
 			jugador_actual = jugador_1;
 		}
+
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				string evento = to_string(tablero[i][j].elemento.jugador) + ";" +
+					tablero[i][j].elemento.nombre + ";" +
+					tablero[i][j].elemento.tipo + ";" +
+					to_string(tablero[i][j].elemento.movimientos) + ";" +
+					to_string(tablero[i][j].elemento.posicion[0]) + "," +
+					to_string(tablero[i][j].elemento.posicion[1]);
+				tablero[i][j].historial.push_back(evento);
+			}
+		}
+
 		cout << "Continuar?" << endl;
 		cin >> respuesta;
 		if (respuesta == "n") {
@@ -609,6 +645,7 @@ int main()
 				for (int i = 0; i < 8; i++) {
 					for (int j = 0; j < 8; j++) {
 						Elemento elem = tablero[i][j].elemento;
+
 						archivo << elem.jugador << ";"
 							<< elem.nombre << ";"
 							<< elem.tipo << ";"
@@ -616,6 +653,7 @@ int main()
 							<< elem.posicion[0] << "," << elem.posicion[1] << "\n";
 					}
 				}
+
 				archivo << estado << "\n";
 				archivo << jugador_actual.capturas << "\n";
 				archivo << jugador_actual.nombre << "\n";
@@ -627,15 +665,25 @@ int main()
 				archivo << jugador_2.nombre << "\n";
 				archivo << jugador_2.numero << "\n";
 				archivo << "NA" << "\n";
+				archivo << movimientos << "\n";
+				for (int i = 0; i < 8; i++) {
+					for (int j = 0; j < 8; j++) {
+						for (const string& jugada : tablero[i][j].historial) {
+							archivo << jugada << "/";
+						}
+						archivo << "\n";
+					}
+				}
 				archivo.close();
+
 				cout << "Archivo creado y escrito exitosamente.\n";
 			}
 			else {
 				cerr << "Error al abrir el archivo.\n";
 			}
+
 			return 0;
 		}
-
 		system("cls");
 	}
 	return 0;
