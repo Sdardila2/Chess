@@ -8,6 +8,8 @@
 
 using namespace std;
 
+
+
 class Elemento
 {
 public:
@@ -34,11 +36,10 @@ class Casilla
 public:
 	vector <int> posicion;
 	Elemento elemento;
-	list <string> historial;
-	list <Casilla> historial2;
+	vector <string> historial;
 	Casilla() {
 	}
-	Casilla(vector <int> v, Elemento e, list <string> h) {
+	Casilla(vector <int> v, Elemento e, vector <string> h) {
 		posicion = v;
 		elemento = e;
 		historial = h;
@@ -189,6 +190,17 @@ int main()
 
 	}
 	else {
+		cout << "Tablero antes de ser registrado:" << endl;
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				cout << i << ", " << j << endl;
+				for (string elemento : tablero[i][j].historial) {
+					cout << elemento << "//";
+				}
+				cout << endl;
+			}
+		}
+
 		cout << "Ingrese el nombre de la partida a cargar: " << endl;
 		cin >> nombre_archivo;
 		ifstream archivo(nombre_archivo + ".txt");
@@ -196,6 +208,8 @@ int main()
 		int linea_num = 0;
 
 		if (archivo.is_open()) {
+			int i = 0;
+			int j = 0;
 			while (getline(archivo, linea)) {
 				linea_num++;
 				if (linea_num <= 64) {
@@ -243,13 +257,79 @@ int main()
 				else if (linea_num == 74) jugador_2.numero = stoi(linea);
 				else if (linea_num == 75) ganador = linea;
 				else if (linea_num == 76) movimientos = stoi(linea);
+				else{
+					cout << linea_num - 76 << endl;
+					stringstream ss2(linea);
+					string temporal;
+					char delimitador = '/';
+					while (getline(ss2, temporal, delimitador)) {
+						cout << "\"" << temporal << "\"" << " " << endl;
+
+						tablero[i][j].historial.push_back(temporal);
+
+
+
+					}
+
+					j++;
+					if (j == 8) {
+						j = 0;
+						i++;
+					}
+
+					cout << endl;
+				}
 			}
 			archivo.close();
 		}
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				cout << i << ", " << j << endl;
+				for (string elemento : tablero[i][j].historial) {
+					cout << elemento << "//";
+				}
+				cout << endl;
+			}
+		}
+		cout << endl;
+		cout << endl;
+		int contador = 0;
+		while (contador < movimientos) {
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					stringstream aux(tablero[i][j].historial[contador]);
+					string temporal2;
+					char delimitador2 = ';';
+					getline(aux, temporal2, delimitador2);
+					getline(aux, temporal2, delimitador2);
+					bool casillaClara = (i + j) % 2 == 0;
+
+					string fondo = casillaClara ? "\033[47m" : "\033[43m";  // Blanco o marrón (amarillo oscuro)
+					string texto = casillaClara ? "\033[30m" : "\033[30m";  // Texto negro en ambos casos
+					string reset = "\033[0m";
+
+					string nombre = temporal2;
+
+					if (nombre.empty()) {
+						cout << fondo << texto << "  " << reset;
+					}
+					else {
+						if (nombre.length() == 1) nombre = " " + nombre;
+						cout << fondo << texto << nombre << reset;
+					}
+				}
+				cout << endl;
+			}
+			contador++;
+			cout << endl;
+		}
+		
+
 	}
 
 	if (estado == "finished") {
 		cout << "Este juego ya finalizó, te mostraremos solo el resultado final del tablero y los movimientos de cada jugador." << endl;
+		cout << "Resultado final: " << endl;
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
 				bool casillaClara = (i + j) % 2 == 0;
@@ -270,6 +350,10 @@ int main()
 			}
 			cout << endl;
 		}
+		cout << endl;
+
+
+
 
 		cout << "Movimientos totales: " << movimientos << endl;
 		cout << "Capturas jugador 1: " << jugador_1.capturas << endl;
