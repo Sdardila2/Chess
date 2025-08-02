@@ -8,7 +8,6 @@
 #include <filesystem>
 #include <SFML/Graphics.hpp>
 
-
 using namespace std;
 
 class Elemento
@@ -47,8 +46,6 @@ public:
 	}
 };
 
-
-
 class Jugador
 {
 public:
@@ -66,6 +63,15 @@ public:
 		numero = z;
 	}
 };
+
+void liberar_memoria(Casilla* tablero[8][8]) {
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			delete tablero[i][j];
+		}
+	}
+	cout << "Memoria liberada" << endl;
+}
 
 void guardar(string ruta_guardado, string nombre_archivo, Casilla* tablero[8][8], string* estado, Jugador jugador_actual, Jugador jugador_1, Jugador jugador_2, int movimientos, vector<string> movimientos_totales) {
 	ofstream archivo(ruta_guardado + nombre_archivo + ".txt");
@@ -119,14 +125,7 @@ void guardar(string ruta_guardado, string nombre_archivo, Casilla* tablero[8][8]
 	}
 }
 
-void liberar_memoria(Casilla* tablero[8][8]) {
-	for (int i = 0; i < 8; i++) {
-		for (int j = 0; j < 8; j++) {
-			delete tablero[i][j];
-		}
-	}
-	cout << "Memoria liberada" << endl;
-}
+
 
 void cargar(string ruta_guardado, string* nombre_archivo, Casilla* tablero[8][8], string* estado, Jugador* jugador_actual, Jugador* jugador_1, Jugador* jugador_2, string* ganador, int* movimientos, vector<string>* movimientos_totales) {
 	cout << "Ingrese el nombre de la partida a cargar: " << endl;
@@ -208,7 +207,7 @@ void cargar(string ruta_guardado, string* nombre_archivo, Casilla* tablero[8][8]
 			}
 			else {
 				movimientos_totales->push_back(linea);
-				cout << linea << endl;
+				// cout << linea << endl;
 			}
 		}
 		archivo.close();
@@ -218,9 +217,9 @@ void cargar(string ruta_guardado, string* nombre_archivo, Casilla* tablero[8][8]
 	cout << endl;
 
 	int contador = 0;
-	string movimiento_hecho;
 	while (contador < *movimientos) {
 		cout << "Movimiento " << contador + 1 << endl;
+		cout << (*movimientos_totales)[contador] << endl;
 
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
