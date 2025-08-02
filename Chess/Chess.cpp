@@ -458,12 +458,14 @@ int main()
 				{
 					if (init_i == final_i && init_j != final_j)
 					{
+						cout << "Movimiento horizontal." << endl;
 						break;
 					}
 					else
 					{
 						if (init_j == final_j && init_i != final_i)
 						{
+							cout << "Movimiento vertical." << endl;
 							break;
 
 						}
@@ -480,10 +482,10 @@ int main()
 					}
 					else {
 						if (columnas_movidas == 2 && filas_movidas == 1) {
-							cout << "Movimiento invalido." << endl;
 							break;
 						}
 						else {
+							cout << "Movimiento invalido." << endl;
 							continue;
 						}
 					}
@@ -553,11 +555,23 @@ int main()
 				}
 
 				else if (tablero[init_i][init_j].elemento.tipo == "peon") {
-					if (columnas_movidas == 0 && filas_movidas == 1) {
-						cout << "Movimiento vertical unitario" << endl;
+					int max_filas = 2;
+					if (tablero[init_i][init_j].elemento.movimientos > 0) {
+						max_filas = 1;
 					}
-					if (columnas_movidas == 1 && filas_movidas == 1 && tablero[init_i][init_j].elemento.jugador != -1) {
-						cout << "Movimiento diagonal unitario" << endl;
+					if (columnas_movidas == 0 && filas_movidas <= max_filas && tablero[final_i][final_j].elemento.jugador == -1) {
+						cout << "Movimiento vertical unitario" << endl;
+						break;
+					}
+					else {
+						if (columnas_movidas == 1 && filas_movidas == 1 && tablero[final_i][final_j].elemento.jugador != -1) {
+							cout << "Movimiento diagonal unitario" << endl;
+							break;
+						}
+						else {
+							cout << "Movimiento invalido." << endl;
+							continue;
+						}
 					}
 
 				}
