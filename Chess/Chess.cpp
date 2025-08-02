@@ -784,7 +784,7 @@ int main()
 				archivo << movimientos << "\n";
 				for (int i = 0; i < 8; i++) {
 					for (int j = 0; j < 8; j++) {
-						for (const string& jugada : tablero[i][j].historial) {
+						for (string jugada : tablero[i][j].historial) {
 							archivo << jugada << "/";
 						}
 						archivo << "\n";
