@@ -11,8 +11,6 @@
 
 using namespace std;
 
-
-
 class Elemento
 {
 public:
@@ -69,7 +67,232 @@ public:
 	}
 };
 
+void guardar(string ruta_guardado, string nombre_archivo, Casilla* tablero[8][8], string* estado, Jugador jugador_actual, Jugador jugador_1, Jugador jugador_2, int movimientos, vector<string> movimientos_totales) {
+	ofstream archivo(ruta_guardado + nombre_archivo + ".txt");
+	if (archivo.is_open()) {
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				if (tablero[i][j]->elemento != nullptr) {
+					Elemento* elem = tablero[i][j]->elemento;
+					archivo << elem->jugador << ";"
+						<< elem->nombre << ";"
+						<< elem->tipo << ";"
+						<< elem->movimientos << ";"
+						<< elem->posicion[0] << "," << elem->posicion[1] << "\n";
+					cout << elem->jugador << endl;
+					cout << elem->nombre << endl;
+					cout << elem->movimientos << endl;
+				}
+				else {
+					archivo << "-1;  ;Vacio;-1;" << i << "," << j << "\n";
+				}
+			}
+		}
+		archivo << *estado << "\n";
+		archivo << jugador_actual.capturas << "\n";
+		archivo << jugador_actual.nombre << "\n";
+		archivo << jugador_actual.numero << "\n";
+		archivo << jugador_1.capturas << "\n";
+		archivo << jugador_1.nombre << "\n";
+		archivo << jugador_1.numero << "\n";
+		archivo << jugador_2.capturas << "\n";
+		archivo << jugador_2.nombre << "\n";
+		archivo << jugador_2.numero << "\n";
+		archivo << jugador_actual.nombre << "\n";
+		archivo << movimientos << "\n";
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				for (string jugada : tablero[i][j]->historial) {
+					archivo << jugada << "/";
+				}
+				archivo << "\n";
+			}
+		}
+		for (string elemento : movimientos_totales) {
+			archivo << elemento << "\n";
+		}
+		archivo.close();
+		cout << "Archivo creado y escrito exitosamente.\n";
+	}
+	else {
+		cerr << "Error al abrir el archivo.\n";
+	}
+}
 
+void liberar_memoria(Casilla* tablero[8][8]) {
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			delete tablero[i][j];
+		}
+	}
+	cout << "Memoria liberada" << endl;
+}
+
+void cargar(string ruta_guardado, string* nombre_archivo, Casilla* tablero[8][8], string* estado, Jugador* jugador_actual, Jugador* jugador_1, Jugador* jugador_2, string* ganador, int* movimientos, vector<string>* movimientos_totales) {
+	cout << "Ingrese el nombre de la partida a cargar: " << endl;
+	cin >> *nombre_archivo;
+	ifstream archivo(ruta_guardado + *nombre_archivo + ".txt");
+	string linea;
+	int linea_num = 0;
+
+	if (archivo.is_open()) {
+		int i = 0;
+		int j = 0;
+		while (getline(archivo, linea)) {
+			linea_num++;
+			if (linea_num <= 64) {
+				// Datos de las fichas
+				stringstream linea_externa(linea);
+				string token;
+
+				// jugador
+				getline(linea_externa, token, ';');
+				int jugador = stoi(token);
+				// nombre
+				getline(linea_externa, token, ';');
+				string nombre = token;
+
+				// tipo
+				getline(linea_externa, token, ';');
+				string tipo = token;
+
+				// movimientos
+				getline(linea_externa, token, ';');
+				int movimientos = stoi(token);
+
+				// posicion (fila,columna)
+				getline(linea_externa, token); // "fila,columna"
+				stringstream linea_interna(token);
+				string parte;
+				getline(linea_interna, parte, ',');
+				int fila = stoi(parte);
+				getline(linea_interna, parte, ',');
+				int columna = stoi(parte);
+
+				// Crear y asignar ficha al tablero
+				if (jugador != -1) {
+					tablero[fila][columna]->elemento = new Elemento(jugador, nombre, tipo, movimientos, { fila, columna });
+				}
+				else {
+					tablero[fila][columna]->elemento = nullptr;
+				}
+			}
+			else if (linea_num == 65) *estado = linea;
+			else if (linea_num == 66) jugador_actual->capturas = linea;
+			else if (linea_num == 67) jugador_actual->nombre = linea;
+			else if (linea_num == 68) jugador_actual->numero = stoi(linea);
+			else if (linea_num == 69) jugador_1->capturas = linea;
+			else if (linea_num == 70) jugador_1->nombre = linea;
+			else if (linea_num == 71) jugador_1->numero = stoi(linea);
+			else if (linea_num == 72) jugador_2->capturas = linea;
+			else if (linea_num == 73) jugador_2->nombre = linea;
+			else if (linea_num == 74) jugador_2->numero = stoi(linea);
+			else if (linea_num == 75) *ganador = linea;
+			else if (linea_num == 76) *movimientos = stoi(linea);
+			else if (linea_num <= 140) {
+				//cout << linea_num - 76 << endl;
+				stringstream ss2(linea);
+				string temporal;
+				char delimitador = '/';
+				while (getline(ss2, temporal, delimitador)) {
+					//cout << "\"" << temporal << "\"" << " " << endl;
+
+					tablero[i][j]->historial.push_back(temporal);
+				}
+
+				j++;
+				if (j == 8) {
+					j = 0;
+					i++;
+				}
+			}
+			else {
+				movimientos_totales->push_back(linea);
+				cout << linea << endl;
+			}
+		}
+		archivo.close();
+	}
+	cout << endl;
+	cout << "Historial de jugadas: " << endl;
+	cout << endl;
+
+	int contador = 0;
+	string movimiento_hecho;
+	while (contador < *movimientos) {
+		cout << "Movimiento " << contador + 1 << endl;
+
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				stringstream aux(tablero[i][j]->historial[contador]);
+				string temporal2;
+				char delimitador2 = ';';
+				getline(aux, temporal2, delimitador2);
+				getline(aux, temporal2, delimitador2);
+				bool casillaClara = (i + j) % 2 == 0;
+
+				string fondo = casillaClara ? "\033[47m" : "\033[43m";  // Blanco o marrón (amarillo oscuro)
+				string texto = casillaClara ? "\033[30m" : "\033[30m";  // Texto negro en ambos casos
+				string reset = "\033[0m";
+
+				string nombre = temporal2;
+
+				if (nombre.empty()) {
+					cout << fondo << texto << "  " << reset;
+				}
+				else {
+					if (nombre.length() == 1) nombre = " " + nombre;
+					cout << fondo << texto << nombre << reset;
+				}
+			}
+			cout << endl;
+		}
+
+		contador++;
+		cout << endl;
+	}
+	if (*estado == "finished") {
+		cout << "Este juego ya finalizó, te mostraremos el resultado final del tablero y los movimientos de cada jugador." << endl;
+		cout << "Resultado final: " << endl;
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				bool casillaClara = (i + j) % 2 == 0;
+
+				string fondo = casillaClara ? "\033[47m" : "\033[43m";  // Blanco o marrón (amarillo oscuro)
+				string texto = casillaClara ? "\033[30m" : "\033[30m";  // Texto negro en ambos casos
+				string reset = "\033[0m";
+				string nombre;
+
+				if (tablero[i][j]->elemento != nullptr) {
+					nombre = tablero[i][j]->elemento->nombre;
+				}
+				else {
+					nombre = "";
+				}
+				if (nombre.empty()) {
+					cout << fondo << texto << "  " << reset;
+				}
+				else {
+					if (nombre.length() == 1) nombre = " " + nombre;
+					cout << fondo << texto << nombre << reset;
+				}
+			}
+			cout << endl;
+		}
+		cout << endl;
+
+
+		cout << "Movimientos totales: " << *movimientos << endl;
+		cout << "Capturas " << jugador_1->nombre << ": " << jugador_1->capturas << endl;
+		cout << "Capturas " << jugador_2->nombre << ": " << jugador_2->capturas << endl;
+		cout << "Lista de movimientos" << endl;
+		for (string elemento : *movimientos_totales) {
+			cout << elemento << endl;
+		}
+		cout << "Ganador: " << *ganador << endl;
+		liberar_memoria(tablero);
+	}
+}
 
 int main()
 {
@@ -96,7 +319,6 @@ int main()
 	Jugador jugador_1;
 	Jugador jugador_2;
 	Casilla* tablero[8][8];
-	tablero[2][0] = new Casilla({ 2, 0 }, nullptr, {});
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
 			if (i != 0 || i != 1 || i != 6 || i != 7) {
@@ -159,245 +381,16 @@ int main()
 		tablero[7][6] = new Casilla({ 7, 6 }, new Elemento(jugador_2.numero, "CB", "caballo", 0, { 7, 6 }), {});
 		tablero[7][7] = new Casilla({ 7, 7 }, new Elemento(jugador_2.numero, "TB", "torre", 0, { 7, 7 }), {});
 
-		cout << "Fichas creadas" << endl;
-
-		ofstream archivo(ruta_guardado + nombre_archivo + ".txt");
-
-		if (archivo.is_open()) {
-			for (int i = 0; i < 8; i++) {
-				for (int j = 0; j < 8; j++) {
-					if (tablero[i][j]->elemento != nullptr) {
-						Elemento* elem = tablero[i][j]->elemento;
-						archivo << elem->jugador << ";"
-							<< elem->nombre << ";"
-							<< elem->tipo << ";"
-							<< elem->movimientos << ";"
-							<< elem->posicion[0] << "," << elem->posicion[1] << "\n";
-						cout << elem->jugador << endl;
-						cout << elem->nombre << endl;
-						cout << elem->movimientos << endl;
-					}
-					else {
-						archivo << "-1;  ;Vacio;-1;" << i << "," << j << "\n";
-					}
-				}
-			}
-			archivo << estado << "\n";
-			archivo << jugador_actual.capturas << "\n";
-			archivo << jugador_actual.nombre << "\n";
-			archivo << jugador_actual.numero << "\n";
-			archivo << jugador_1.capturas << "\n";
-			archivo << jugador_1.nombre << "\n";
-			archivo << jugador_1.numero << "\n";
-			archivo << jugador_2.capturas << "\n";
-			archivo << jugador_2.nombre << "\n";
-			archivo << jugador_2.numero << "\n";
-			archivo << "NA" << "\n";
-			archivo << movimientos << "\n";
-			archivo.close();
-			cout << "Archivo creado y escrito exitosamente.\n";
-		}
-		else {
-			cerr << "Error al abrir el archivo.\n";
-		}
-
+		guardar(ruta_guardado, nombre_archivo, tablero, &estado, jugador_actual, jugador_1, jugador_2, movimientos, movimientos_totales);
 	}
 	else {
-		/*cout << "Tablero antes de ser registrado:" << endl;
-		for (int i = 0; i < 8; i++) {
-			for (int j = 0; j < 8; j++) {
-				cout << i << ", " << j << endl;
-				for (string elemento : tablero[i][j].historial) {
-					cout << elemento << "//";
-				}
-				cout << endl;
-			}
-		}*/
-
-		cout << "Ingrese el nombre de la partida a cargar: " << endl;
-		cin >> nombre_archivo;
-		ifstream archivo(ruta_guardado + nombre_archivo + ".txt");
-		string linea;
-		int linea_num = 0;
-
-		if (archivo.is_open()) {
-			int i = 0;
-			int j = 0;
-			while (getline(archivo, linea)) {
-				linea_num++;
-				if (linea_num <= 64) {
-					// Datos de las fichas
-					stringstream linea_externa(linea);
-					string token;
-
-					// jugador
-					getline(linea_externa, token, ';');
-					int jugador = stoi(token);
-					// nombre
-					getline(linea_externa, token, ';');
-					string nombre = token;
-
-					// tipo
-					getline(linea_externa, token, ';');
-					string tipo = token;
-
-					// movimientos
-					getline(linea_externa, token, ';');
-					int movimientos = stoi(token);
-
-					// posicion (fila,columna)
-					getline(linea_externa, token); // "fila,columna"
-					stringstream linea_interna(token);
-					string parte;
-					getline(linea_interna, parte, ',');
-					int fila = stoi(parte);
-					getline(linea_interna, parte, ',');
-					int columna = stoi(parte);
-
-					// Crear y asignar ficha al tablero
-					if (jugador != -1) {
-						tablero[fila][columna]->elemento = new Elemento(jugador, nombre, tipo, movimientos, { fila, columna });
-					}
-					else {
-						tablero[fila][columna]->elemento = nullptr;
-					}
-				}
-				else if (linea_num == 65) estado = linea;
-				else if (linea_num == 66) jugador_actual.capturas = linea;
-				else if (linea_num == 67) jugador_actual.nombre = linea;
-				else if (linea_num == 68) jugador_actual.numero = stoi(linea);
-				else if (linea_num == 69) jugador_1.capturas = linea;
-				else if (linea_num == 70) jugador_1.nombre = linea;
-				else if (linea_num == 71) jugador_1.numero = stoi(linea);
-				else if (linea_num == 72) jugador_2.capturas = linea;
-				else if (linea_num == 73) jugador_2.nombre = linea;
-				else if (linea_num == 74) jugador_2.numero = stoi(linea);
-				else if (linea_num == 75) ganador = linea;
-				else if (linea_num == 76) movimientos = stoi(linea);
-				else if (linea_num <= 140) {
-					//cout << linea_num - 76 << endl;
-					stringstream ss2(linea);
-					string temporal;
-					char delimitador = '/';
-					while (getline(ss2, temporal, delimitador)) {
-						//cout << "\"" << temporal << "\"" << " " << endl;
-
-						tablero[i][j]->historial.push_back(temporal);
-					}
-
-					j++;
-					if (j == 8) {
-						j = 0;
-						i++;
-					}
-				}
-				else {
-					movimientos_totales.push_back(linea);
-				}
-			}
-			archivo.close();
+		cargar(ruta_guardado, &nombre_archivo, tablero, &estado, &jugador_actual, &jugador_1, &jugador_2, &ganador, &movimientos, &movimientos_totales);
+		if (estado == "finished") {
+			return 0;
 		}
-		/*for (int i = 0; i < 8; i++) {
-			for (int j = 0; j < 8; j++) {
-				cout << i << ", " << j << endl;
-				for (string elemento : tablero[i][j].historial) {
-					cout << elemento << "//";
-				}
-				cout << endl;
-			}
-		}
-		*/
-		cout << endl;
-
-		cout << "Historial de jugadas: " << endl;
-		cout << endl;
-
-		int contador = 0;
-		while (contador < movimientos) {
-			cout << "Movimiento " << contador + 1 << endl;
-			cout << movimientos_totales[contador] << endl;
-
-			for (int i = 0; i < 8; i++) {
-				for (int j = 0; j < 8; j++) {
-					stringstream aux(tablero[i][j]->historial[contador]);
-					string temporal2;
-					char delimitador2 = ';';
-					getline(aux, temporal2, delimitador2);
-					getline(aux, temporal2, delimitador2);
-					bool casillaClara = (i + j) % 2 == 0;
-
-					string fondo = casillaClara ? "\033[47m" : "\033[43m";  // Blanco o marrón (amarillo oscuro)
-					string texto = casillaClara ? "\033[30m" : "\033[30m";  // Texto negro en ambos casos
-					string reset = "\033[0m";
-
-					string nombre = temporal2;
-
-					if (nombre.empty()) {
-						cout << fondo << texto << "  " << reset;
-					}
-					else {
-						if (nombre.length() == 1) nombre = " " + nombre;
-						cout << fondo << texto << nombre << reset;
-					}
-				}
-				cout << endl;
-			}
-			contador++;
-			cout << endl;
-		}
-
-
 	}
 
-	if (estado == "finished") {
-		cout << "Este juego ya finalizó, te mostraremos el resultado final del tablero y los movimientos de cada jugador." << endl;
-		cout << "Resultado final: " << endl;
-		for (int i = 0; i < 8; i++) {
-			for (int j = 0; j < 8; j++) {
-				bool casillaClara = (i + j) % 2 == 0;
 
-				string fondo = casillaClara ? "\033[47m" : "\033[43m";  // Blanco o marrón (amarillo oscuro)
-				string texto = casillaClara ? "\033[30m" : "\033[30m";  // Texto negro en ambos casos
-				string reset = "\033[0m";
-				string nombre;
-
-				if (tablero[i][j]->elemento != nullptr) {
-					nombre = tablero[i][j]->elemento->nombre;
-				}
-				else {
-					nombre = "";
-				}
-				if (nombre.empty()) {
-					cout << fondo << texto << "  " << reset;
-				}
-				else {
-					if (nombre.length() == 1) nombre = " " + nombre;
-					cout << fondo << texto << nombre << reset;
-				}
-			}
-			cout << endl;
-		}
-		cout << endl;
-
-
-		cout << "Movimientos totales: " << movimientos << endl;
-		cout << "Capturas " << jugador_1.nombre << ": " << jugador_1.capturas << endl;
-		cout << "Capturas " << jugador_2.nombre << ": " << jugador_2.capturas << endl;
-		cout << "Lista de movimientos" << endl;
-		for (string elemento : movimientos_totales) {
-			cout << elemento << endl;
-		}
-		cout << "Ganador: " << ganador << endl;
-
-		// Liberando memoria
-		for (int i = 0; i < 8; i++) {
-			for (int j = 0; j < 8; j++) {
-				delete tablero[i][j];
-			}
-		}
-		cout << "Memoria liberada" << endl;
-		return 0;
-	}
 
 	while (true)
 	{
@@ -674,64 +667,8 @@ int main()
 
 					estado = "finished";
 
-					ofstream archivo(ruta_guardado + nombre_archivo + ".txt");
-
-					if (archivo.is_open()) {
-						for (int i = 0; i < 8; i++) {
-							for (int j = 0; j < 8; j++) {
-								if (tablero[i][j]->elemento != nullptr) {
-									Elemento* elem = tablero[i][j]->elemento;
-									archivo << elem->jugador << ";"
-										<< elem->nombre << ";"
-										<< elem->tipo << ";"
-										<< elem->movimientos << ";"
-										<< elem->posicion[0] << "," << elem->posicion[1] << "\n";
-									cout << elem->jugador << endl;
-									cout << elem->nombre << endl;
-									cout << elem->movimientos << endl;
-								}
-								else {
-									archivo << "-1;  ;Vacio;-1;" << i << "," << j << "\n";
-								}
-							}
-						}
-						archivo << estado << "\n";
-						archivo << jugador_actual.capturas << "\n";
-						archivo << jugador_actual.nombre << "\n";
-						archivo << jugador_actual.numero << "\n";
-						archivo << jugador_1.capturas << "\n";
-						archivo << jugador_1.nombre << "\n";
-						archivo << jugador_1.numero << "\n";
-						archivo << jugador_2.capturas << "\n";
-						archivo << jugador_2.nombre << "\n";
-						archivo << jugador_2.numero << "\n";
-						archivo << jugador_actual.nombre << "\n";
-						archivo << movimientos << "\n";
-						for (int i = 0; i < 8; i++) {
-							for (int j = 0; j < 8; j++) {
-								for (string jugada : tablero[i][j]->historial) {
-									archivo << jugada << "/";
-								}
-								archivo << "\n";
-							}
-						}
-						for (string elemento : movimientos_totales) {
-							archivo << elemento << "\n";
-						}
-						archivo.close();
-						cout << "Archivo creado y escrito exitosamente.\n";
-					}
-					else {
-						cerr << "Error al abrir el archivo.\n";
-					}
-
-					// Liberando memoria
-					for (int i = 0; i < 8; i++) {
-						for (int j = 0; j < 8; j++) {
-							delete tablero[i][j];
-						}
-					}
-					cout << "Memoria liberada" << endl;
+					guardar(ruta_guardado, nombre_archivo, tablero, &estado, jugador_actual, jugador_1, jugador_2, movimientos, movimientos_totales);
+					liberar_memoria(tablero);
 
 					return 0;
 				}
@@ -780,65 +717,8 @@ int main()
 		cout << "Continuar?" << endl;
 		cin >> respuesta;
 		if (respuesta == "n") {
-			ofstream archivo(ruta_guardado + nombre_archivo + ".txt");
-
-			if (archivo.is_open()) {
-				for (int i = 0; i < 8; i++) {
-					for (int j = 0; j < 8; j++) {
-						if (tablero[i][j]->elemento != nullptr) {
-							Elemento* elem = tablero[i][j]->elemento;
-							archivo << elem->jugador << ";"
-								<< elem->nombre << ";"
-								<< elem->tipo << ";"
-								<< elem->movimientos << ";"
-								<< elem->posicion[0] << "," << elem->posicion[1] << "\n";
-							cout << elem->jugador << endl;
-							cout << elem->nombre << endl;
-							cout << elem->movimientos << endl;
-						}
-						else {
-							archivo << "-1;  ;Vacio;-1;" << i << "," << j << "\n";
-						}
-					}
-				}
-				archivo << estado << "\n";
-				archivo << jugador_actual.capturas << "\n";
-				archivo << jugador_actual.nombre << "\n";
-				archivo << jugador_actual.numero << "\n";
-				archivo << jugador_1.capturas << "\n";
-				archivo << jugador_1.nombre << "\n";
-				archivo << jugador_1.numero << "\n";
-				archivo << jugador_2.capturas << "\n";
-				archivo << jugador_2.nombre << "\n";
-				archivo << jugador_2.numero << "\n";
-				archivo << "NA" << "\n";
-				archivo << movimientos << "\n";
-				for (int i = 0; i < 8; i++) {
-					for (int j = 0; j < 8; j++) {
-						for (string jugada : tablero[i][j]->historial) {
-							archivo << jugada << "/";
-						}
-						archivo << "\n";
-					}
-				}
-				for (string elemento : movimientos_totales) {
-					archivo << elemento << "\n";
-				}
-				archivo.close();
-				cout << "Archivo creado y escrito exitosamente.\n";
-			}
-			else {
-				cerr << "Error al abrir el archivo.\n";
-			}
-
-			// Liberando memoria
-			for (int i = 0; i < 8; i++) {
-				for (int j = 0; j < 8; j++) {
-					delete tablero[i][j];
-				}
-			}
-			cout << "Memoria liberada" << endl;
-
+			guardar(ruta_guardado, nombre_archivo, tablero, &estado, jugador_actual, jugador_1, jugador_2, movimientos, movimientos_totales);
+			liberar_memoria(tablero);
 			return 0;
 		}
 		system("cls");
