@@ -38,11 +38,11 @@ class Casilla
 {
 public:
 	vector <int> posicion;
-	Elemento elemento;
+	Elemento* elemento;
 	vector <string> historial;
 	Casilla() {
 	}
-	Casilla(vector <int> v, Elemento e, vector <string> h) {
+	Casilla(vector <int> v, Elemento* e, vector <string> h) {
 		posicion = v;
 		elemento = e;
 		historial = h;
@@ -85,6 +85,8 @@ int main()
 	int movimientos = 0;
 	int filas_movidas;
 	int columnas_movidas;
+	int init_i, init_j, final_i, final_j;
+
 	string respuesta;
 	string ganador;
 	string estado = "active";
@@ -93,13 +95,13 @@ int main()
 	Jugador jugador_actual;
 	Jugador jugador_1;
 	Jugador jugador_2;
-	Casilla tablero[8][8];
-
-	for (int i = 0; i <= 8 - 1; i++)
-	{
-		for (int j = 0; j <= 8 - 1; j++)
-		{
-			tablero[i][j] = Casilla({ i, j }, Elemento(-1, "  ", "vacio", -1, { i, j }), {});
+	Casilla* tablero[8][8];
+	tablero[2][0] = new Casilla({ 2, 0 }, nullptr, {});
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			if (i != 0 || i != 1 || i != 6 || i != 7) {
+				tablero[i][j] = new Casilla({ i, j }, nullptr, {});
+			}
 		}
 	}
 
@@ -118,56 +120,66 @@ int main()
 		jugador_actual = jugador_1;
 
 		// Peones del jugador 0 (blancas)
-		tablero[1][0].elemento = Elemento(jugador_1.numero, "P1", "peon", 0, tablero[1][0].posicion);
-		tablero[1][1].elemento = Elemento(jugador_1.numero, "P2", "peon", 0, tablero[1][1].posicion);
-		tablero[1][2].elemento = Elemento(jugador_1.numero, "P3", "peon", 0, tablero[1][2].posicion);
-		tablero[1][3].elemento = Elemento(jugador_1.numero, "P4", "peon", 0, tablero[1][3].posicion);
-		tablero[1][4].elemento = Elemento(jugador_1.numero, "P5", "peon", 0, tablero[1][4].posicion);
-		tablero[1][5].elemento = Elemento(jugador_1.numero, "P6", "peon", 0, tablero[1][5].posicion);
-		tablero[1][6].elemento = Elemento(jugador_1.numero, "P7", "peon", 0, tablero[1][6].posicion);
-		tablero[1][7].elemento = Elemento(jugador_1.numero, "P8", "peon", 0, tablero[1][7].posicion);
+		tablero[1][0] = new Casilla({ 1, 0 }, new Elemento(jugador_1.numero, "P1", "peon", 0, { 1, 0 }), {});
+		tablero[1][1] = new Casilla({ 1, 1 }, new Elemento(jugador_1.numero, "P2", "peon", 0, { 1, 1 }), {});
+		tablero[1][2] = new Casilla({ 1, 2 }, new Elemento(jugador_1.numero, "P3", "peon", 0, { 1, 2 }), {});
+		tablero[1][3] = new Casilla({ 1, 3 }, new Elemento(jugador_1.numero, "P4", "peon", 0, { 1, 3 }), {});
+		tablero[1][4] = new Casilla({ 1, 4 }, new Elemento(jugador_1.numero, "P5", "peon", 0, { 1, 4 }), {});
+		tablero[1][5] = new Casilla({ 1, 5 }, new Elemento(jugador_1.numero, "P6", "peon", 0, { 1, 5 }), {});
+		tablero[1][6] = new Casilla({ 1, 6 }, new Elemento(jugador_1.numero, "P7", "peon", 0, { 1, 6 }), {});
+		tablero[1][7] = new Casilla({ 1, 7 }, new Elemento(jugador_1.numero, "P8", "peon", 0, { 1, 7 }), {});
 
 		// Piezas principales del jugador 0
-		tablero[0][0].elemento = Elemento(jugador_1.numero, "T1", "torre", 0, tablero[0][0].posicion);
-		tablero[0][1].elemento = Elemento(jugador_1.numero, "C1", "caballo", 0, tablero[0][1].posicion);
-		tablero[0][2].elemento = Elemento(jugador_1.numero, "A1", "alfil", 0, tablero[0][2].posicion);
-		tablero[0][3].elemento = Elemento(jugador_1.numero, "R1", "rey", 0, tablero[0][3].posicion);
-		tablero[0][4].elemento = Elemento(jugador_1.numero, "D1", "dama", 0, tablero[0][4].posicion);
-		tablero[0][5].elemento = Elemento(jugador_1.numero, "A2", "alfil", 0, tablero[0][5].posicion);
-		tablero[0][6].elemento = Elemento(jugador_1.numero, "C2", "caballo", 0, tablero[0][6].posicion);
-		tablero[0][7].elemento = Elemento(jugador_1.numero, "T2", "torre", 0, tablero[0][7].posicion);
+		tablero[0][0] = new Casilla({ 0, 0 }, new Elemento(jugador_1.numero, "T1", "torre", 0, { 0, 0 }), {});
+		tablero[0][1] = new Casilla({ 0, 1 }, new Elemento(jugador_1.numero, "C1", "caballo", 0, { 0, 1 }), {});
+		tablero[0][2] = new Casilla({ 0, 2 }, new Elemento(jugador_1.numero, "A1", "alfil", 0, { 0, 2 }), {});
+		tablero[0][3] = new Casilla({ 0, 3 }, new Elemento(jugador_1.numero, "R1", "rey", 0, { 0, 3 }), {});
+		tablero[0][4] = new Casilla({ 0, 4 }, new Elemento(jugador_1.numero, "D1", "dama", 0, { 0, 4 }), {});
+		tablero[0][5] = new Casilla({ 0, 5 }, new Elemento(jugador_1.numero, "A2", "alfil", 0, { 0, 5 }), {});
+		tablero[0][6] = new Casilla({ 0, 6 }, new Elemento(jugador_1.numero, "C2", "caballo", 0, { 0, 6 }), {});
+		tablero[0][7] = new Casilla({ 0, 7 }, new Elemento(jugador_1.numero, "T2", "torre", 0, { 0, 7 }), {});
 
 		// Peones del jugador 1 (negras)
-		tablero[6][0].elemento = Elemento(jugador_2.numero, "PA", "peon", 0, tablero[6][0].posicion);
-		tablero[6][1].elemento = Elemento(jugador_2.numero, "PB", "peon", 0, tablero[6][1].posicion);
-		tablero[6][2].elemento = Elemento(jugador_2.numero, "PC", "peon", 0, tablero[6][2].posicion);
-		tablero[6][3].elemento = Elemento(jugador_2.numero, "PD", "peon", 0, tablero[6][3].posicion);
-		tablero[6][4].elemento = Elemento(jugador_2.numero, "PE", "peon", 0, tablero[6][4].posicion);
-		tablero[6][5].elemento = Elemento(jugador_2.numero, "PF", "peon", 0, tablero[6][5].posicion);
-		tablero[6][6].elemento = Elemento(jugador_2.numero, "PG", "peon", 0, tablero[6][6].posicion);
-		tablero[6][7].elemento = Elemento(jugador_2.numero, "PH", "peon", 0, tablero[6][7].posicion);
+		tablero[6][0] = new Casilla({ 6, 0 }, new Elemento(jugador_2.numero, "PA", "peon", 0, { 6, 0 }), {});
+		tablero[6][1] = new Casilla({ 6, 1 }, new Elemento(jugador_2.numero, "PB", "peon", 0, { 6, 1 }), {});
+		tablero[6][2] = new Casilla({ 6, 2 }, new Elemento(jugador_2.numero, "PC", "peon", 0, { 6, 2 }), {});
+		tablero[6][3] = new Casilla({ 6, 3 }, new Elemento(jugador_2.numero, "PD", "peon", 0, { 6, 3 }), {});
+		tablero[6][4] = new Casilla({ 6, 4 }, new Elemento(jugador_2.numero, "PE", "peon", 0, { 6, 4 }), {});
+		tablero[6][5] = new Casilla({ 6, 5 }, new Elemento(jugador_2.numero, "PF", "peon", 0, { 6, 5 }), {});
+		tablero[6][6] = new Casilla({ 6, 6 }, new Elemento(jugador_2.numero, "PG", "peon", 0, { 6, 6 }), {});
+		tablero[6][7] = new Casilla({ 6, 7 }, new Elemento(jugador_2.numero, "PH", "peon", 0, { 6, 7 }), {});
 
 		// Piezas principales del jugador 1
-		tablero[7][0].elemento = Elemento(jugador_2.numero, "TA", "torre", 0, tablero[7][0].posicion);
-		tablero[7][1].elemento = Elemento(jugador_2.numero, "CA", "caballo", 0, tablero[7][1].posicion);
-		tablero[7][2].elemento = Elemento(jugador_2.numero, "AA", "alfil", 0, tablero[7][2].posicion);
-		tablero[7][3].elemento = Elemento(jugador_2.numero, "RA", "rey", 0, tablero[7][3].posicion);
-		tablero[7][4].elemento = Elemento(jugador_2.numero, "DA", "dama", 0, tablero[7][4].posicion);
-		tablero[7][5].elemento = Elemento(jugador_2.numero, "AB", "alfil", 0, tablero[7][5].posicion);
-		tablero[7][6].elemento = Elemento(jugador_2.numero, "CB", "caballo", 0, tablero[7][6].posicion);
-		tablero[7][7].elemento = Elemento(jugador_2.numero, "TB", "torre", 0, tablero[7][7].posicion);
+		tablero[7][0] = new Casilla({ 7, 0 }, new Elemento(jugador_2.numero, "TA", "torre", 0, { 7, 0 }), {});
+		tablero[7][1] = new Casilla({ 7, 1 }, new Elemento(jugador_2.numero, "CA", "caballo", 0, { 7, 1 }), {});
+		tablero[7][2] = new Casilla({ 7, 2 }, new Elemento(jugador_2.numero, "AA", "alfil", 0, { 7, 2 }), {});
+		tablero[7][3] = new Casilla({ 7, 3 }, new Elemento(jugador_2.numero, "RA", "rey", 0, { 7, 3 }), {});
+		tablero[7][4] = new Casilla({ 7, 4 }, new Elemento(jugador_2.numero, "DA", "dama", 0, { 7, 4 }), {});
+		tablero[7][5] = new Casilla({ 7, 5 }, new Elemento(jugador_2.numero, "AB", "alfil", 0, { 7, 5 }), {});
+		tablero[7][6] = new Casilla({ 7, 6 }, new Elemento(jugador_2.numero, "CB", "caballo", 0, { 7, 6 }), {});
+		tablero[7][7] = new Casilla({ 7, 7 }, new Elemento(jugador_2.numero, "TB", "torre", 0, { 7, 7 }), {});
+
+		cout << "Fichas creadas" << endl;
 
 		ofstream archivo(ruta_guardado + nombre_archivo + ".txt");
 
 		if (archivo.is_open()) {
 			for (int i = 0; i < 8; i++) {
 				for (int j = 0; j < 8; j++) {
-					Elemento elem = tablero[i][j].elemento;
-					archivo << elem.jugador << ";"
-						<< elem.nombre << ";"
-						<< elem.tipo << ";"
-						<< elem.movimientos << ";"
-						<< elem.posicion[0] << "," << elem.posicion[1] << "\n";
+					if (tablero[i][j]->elemento != nullptr) {
+						Elemento* elem = tablero[i][j]->elemento;
+						archivo << elem->jugador << ";"
+							<< elem->nombre << ";"
+							<< elem->tipo << ";"
+							<< elem->movimientos << ";"
+							<< elem->posicion[0] << "," << elem->posicion[1] << "\n";
+						cout << elem->jugador << endl;
+						cout << elem->nombre << endl;
+						cout << elem->movimientos << endl;
+					}
+					else {
+						archivo << "-1;  ;Vacio;-1;" << i << "," << j << "\n";
+					}
 				}
 			}
 			archivo << estado << "\n";
@@ -221,7 +233,6 @@ int main()
 					// jugador
 					getline(linea_externa, token, ';');
 					int jugador = stoi(token);
-
 					// nombre
 					getline(linea_externa, token, ';');
 					string nombre = token;
@@ -244,7 +255,12 @@ int main()
 					int columna = stoi(parte);
 
 					// Crear y asignar ficha al tablero
-					tablero[fila][columna].elemento = Elemento(jugador, nombre, tipo, movimientos, { fila, columna });
+					if (jugador != -1) {
+						tablero[fila][columna]->elemento = new Elemento(jugador, nombre, tipo, movimientos, { fila, columna });
+					}
+					else {
+						tablero[fila][columna]->elemento = nullptr;
+					}
 				}
 				else if (linea_num == 65) estado = linea;
 				else if (linea_num == 66) jugador_actual.capturas = linea;
@@ -266,7 +282,7 @@ int main()
 					while (getline(ss2, temporal, delimitador)) {
 						//cout << "\"" << temporal << "\"" << " " << endl;
 
-						tablero[i][j].historial.push_back(temporal);
+						tablero[i][j]->historial.push_back(temporal);
 					}
 
 					j++;
@@ -303,7 +319,7 @@ int main()
 
 			for (int i = 0; i < 8; i++) {
 				for (int j = 0; j < 8; j++) {
-					stringstream aux(tablero[i][j].historial[contador]);
+					stringstream aux(tablero[i][j]->historial[contador]);
 					string temporal2;
 					char delimitador2 = ';';
 					getline(aux, temporal2, delimitador2);
@@ -343,9 +359,14 @@ int main()
 				string fondo = casillaClara ? "\033[47m" : "\033[43m";  // Blanco o marrón (amarillo oscuro)
 				string texto = casillaClara ? "\033[30m" : "\033[30m";  // Texto negro en ambos casos
 				string reset = "\033[0m";
+				string nombre;
 
-				string nombre = tablero[i][j].elemento.nombre;
-
+				if (tablero[i][j]->elemento != nullptr) {
+					nombre = tablero[i][j]->elemento->nombre;
+				}
+				else {
+					nombre = "";
+				}
 				if (nombre.empty()) {
 					cout << fondo << texto << "  " << reset;
 				}
@@ -359,8 +380,6 @@ int main()
 		cout << endl;
 
 
-
-
 		cout << "Movimientos totales: " << movimientos << endl;
 		cout << "Capturas " << jugador_1.nombre << ": " << jugador_1.capturas << endl;
 		cout << "Capturas " << jugador_2.nombre << ": " << jugador_2.capturas << endl;
@@ -370,7 +389,13 @@ int main()
 		}
 		cout << "Ganador: " << ganador << endl;
 
-
+		// Liberando memoria
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				delete tablero[i][j];
+			}
+		}
+		cout << "Memoria liberada" << endl;
 		return 0;
 	}
 
@@ -385,9 +410,14 @@ int main()
 				string fondo = casillaClara ? "\033[47m" : "\033[43m";  // Blanco o marrón (amarillo oscuro)
 				string texto = casillaClara ? "\033[30m" : "\033[30m";  // Texto negro en ambos casos
 				string reset = "\033[0m";
+				string nombre;
 
-				string nombre = tablero[i][j].elemento.nombre;
-
+				if (tablero[i][j]->elemento != nullptr) {
+					nombre = tablero[i][j]->elemento->nombre;
+				}
+				else {
+					nombre = "";
+				}
 				if (nombre.empty()) {
 					cout << fondo << texto << "  " << reset;
 				}
@@ -405,9 +435,11 @@ int main()
 		{
 			for (int j = 0; j <= 8 - 1; j++)
 			{
-				if (tablero[i][j].elemento.jugador == jugador_actual.numero)
-				{
-					cout << tablero[i][j].posicion[0] << tablero[i][j].posicion[1] << ":" << tablero[i][j].elemento.nombre << endl;
+				if (tablero[i][j]->elemento != nullptr) {
+					if (tablero[i][j]->elemento->jugador == jugador_actual.numero)
+					{
+						cout << tablero[i][j]->posicion[0] << tablero[i][j]->posicion[1] << ":" << tablero[i][j]->elemento->nombre << endl;
+					}
 				}
 			}
 		}
@@ -422,7 +454,6 @@ int main()
 		}
 
 
-		int init_i, init_j, final_i, final_j;
 
 		while (true)
 		{
@@ -431,12 +462,12 @@ int main()
 				cin >> init_i;
 				cout << "Posicion inicial de j: ";
 				cin >> init_j;
-				if (tablero[init_i][init_j].elemento.jugador != jugador_actual.numero) {
+				if (tablero[init_i][init_j]->elemento->jugador != jugador_actual.numero) {
 					cout << "No puede seleccionar una ficha ajena." << endl;
 					continue;
 				}
-				cout << "Ficha seleccionada: " << tablero[init_i][init_j].elemento.tipo << endl;
-				cout << "Movimientos: " << tablero[init_i][init_j].elemento.movimientos << endl;
+				cout << "Ficha seleccionada: " << tablero[init_i][init_j]->elemento->tipo << endl;
+				cout << "Movimientos: " << tablero[init_i][init_j]->elemento->movimientos << endl;
 
 				break;
 			}
@@ -446,15 +477,19 @@ int main()
 				cin >> final_i;
 				cout << "Posicion final de j: ";
 				cin >> final_j;
-				if (tablero[final_i][final_j].elemento.jugador == jugador_actual.numero) {
-					cout << "No puede sobreescribir sus propias fichas." << endl;
-					continue;
+				if (tablero[final_i][final_j]->elemento != nullptr) {
+					if (tablero[final_i][final_j]->elemento->jugador == jugador_actual.numero) {
+						cout << "No puede sobreescribir sus propias fichas." << endl;
+						continue;
+					}
 				}
 
 				filas_movidas = abs(final_i - init_i);
 				columnas_movidas = abs(final_j - init_j);
+				cout << filas_movidas << endl;
+				cout << columnas_movidas << endl;
 
-				if (tablero[init_i][init_j].elemento.tipo == "torre")
+				if (tablero[init_i][init_j]->elemento->tipo == "torre")
 				{
 					if (init_i == final_i && init_j != final_j)
 					{
@@ -476,7 +511,7 @@ int main()
 					}
 				}
 
-				else if (tablero[init_i][init_j].elemento.tipo == "caballo") {
+				else if (tablero[init_i][init_j]->elemento->tipo == "caballo") {
 					if (filas_movidas == 2 && columnas_movidas == 1) {
 						break;
 					}
@@ -491,7 +526,7 @@ int main()
 					}
 				}
 
-				else if (tablero[init_i][init_j].elemento.tipo == "alfil") {
+				else if (tablero[init_i][init_j]->elemento->tipo == "alfil") {
 					if (filas_movidas == columnas_movidas) {
 						break;
 					}
@@ -503,7 +538,7 @@ int main()
 
 				}
 
-				else if (tablero[init_i][init_j].elemento.tipo == "dama") {
+				else if (tablero[init_i][init_j]->elemento->tipo == "dama") {
 					if (filas_movidas == 0 && columnas_movidas != 0)
 					{
 						break;
@@ -527,7 +562,7 @@ int main()
 					}
 				}
 
-				else if (tablero[init_i][init_j].elemento.tipo == "rey") {
+				else if (tablero[init_i][init_j]->elemento->tipo == "rey") {
 					if (columnas_movidas == 0 && filas_movidas == 1)
 					{
 						cout << "Movimiento horizontal" << endl;
@@ -554,17 +589,19 @@ int main()
 					}
 				}
 
-				else if (tablero[init_i][init_j].elemento.tipo == "peon") {
+
+				else if (tablero[init_i][init_j]->elemento->tipo == "peon") {
 					int max_filas = 2;
-					if (tablero[init_i][init_j].elemento.movimientos > 0) {
+					if (tablero[init_i][init_j]->elemento->movimientos > 0) {
 						max_filas = 1;
 					}
-					if (columnas_movidas == 0 && filas_movidas <= max_filas && tablero[final_i][final_j].elemento.jugador == -1) {
+
+					if (columnas_movidas == 0 && filas_movidas <= max_filas && tablero[final_i][final_j]->elemento == nullptr) {
 						cout << "Movimiento vertical unitario" << endl;
 						break;
 					}
 					else {
-						if (columnas_movidas == 1 && filas_movidas == 1 && tablero[final_i][final_j].elemento.jugador != -1) {
+						if (columnas_movidas == 1 && filas_movidas == 1 && tablero[final_i][final_j]->elemento != nullptr) {
 							cout << "Movimiento diagonal unitario" << endl;
 							break;
 						}
@@ -575,173 +612,142 @@ int main()
 					}
 
 				}
-
-				/*
-				if (tablero[init_i][init_j].tipo == "peon")
-				{
-
-					int movimiento_maximo_peon;
-					int movimiento_minimo_peon;
-					int adelante_peon_superior;
-					int adelante_peon_inferior;
-
-					if (tablero[init_i][init_j].movimientos == 0)
-					{
-						movimiento_maximo_peon = 2;
-						movimiento_minimo_peon = 1;
-						if (tablero[init_i][init_j].jugador == 0)
-						{
-							adelante_peon_superior = 2;
-							adelante_peon_inferior = 1;
-						}
-						if (tablero[init_i][init_j].jugador == 1)
-						{
-							adelante_peon_superior = -2;
-							adelante_peon_inferior = -1;
-						}
-
-					}
-					else
-					{
-						movimiento_minimo_peon = 1;
-						movimiento_maximo_peon = movimiento_minimo_peon;
-						if (tablero[init_i][init_j].jugador == 0)
-						{
-							adelante_peon_superior = 1;
-							adelante_peon_inferior = 1;
-						}
-						if (tablero[init_i][init_j].jugador == 1)
-						{
-							adelante_peon_superior = -1;
-							adelante_peon_inferior = -1;
-						}
-
-					}
-					if ((abs(final_i - init_i) <= movimiento_maximo_peon && abs(final_i - init_i) >= movimiento_minimo_peon) && (final_j == init_j) && (tablero[final_i][final_j].jugador == -1) && (final_i - init_i == adelante_peon_superior || final_i - init_i == adelante_peon_inferior))
-					{
-						break;
-					}
-					else
-					{
-						if ((abs(final_i - init_i) == movimiento_minimo_peon) && (final_j - init_j == 1 || init_j - final_j == 1) && (tablero[final_i][final_j].jugador != -1) && (final_i - init_i == adelante_peon_superior || final_i - init_i == adelante_peon_inferior))
-						{
-							break;
-
-
-
-						}
-
-						else
-						{
-							cout << "Los peones no pueden realizar estos movimientos." << endl;
-							continue;
-						}
-					}
-				}*/
-				break;
 			}
 			break;
 		}
 
-		string movement = tablero[init_i][init_j].elemento.nombre + ":{" + to_string(init_i) + ',' + to_string(init_j) + "}->{" + to_string(final_i) + "," + to_string(final_j) + "}" + " (" + jugador_actual.nombre + ")";
-		// cout << movement << endl;
+		string movement = tablero[init_i][init_j]->elemento->nombre + ":{" + to_string(init_i) + ',' + to_string(init_j) + "}->{" + to_string(final_i) + "," + to_string(final_j) + "}" + " (" + jugador_actual.nombre + ")";
+		cout << movement << endl;
 
-		if (tablero[final_i][final_j].elemento.jugador != -1 && tablero[final_i][final_j].elemento.tipo != "rey")
-		{
-			if (jugador_actual.numero == 0) {
-				jugador_1.capturas += tablero[init_i][init_j].elemento.nombre + "->" + tablero[final_i][final_j].elemento.nombre + ";";
-			}
-			else {
-				jugador_2.capturas += tablero[init_i][init_j].elemento.nombre + "->" + tablero[final_i][final_j].elemento.nombre + ";";
-			}
-		}
-
-		else
-		{
-			if (tablero[final_i][final_j].elemento.tipo == "rey") {
-				cout << "Jaque mate!" << endl;
-
-				movimientos++;
-				movimientos_totales.push_back(movement);
-
+		if (tablero[final_i][final_j]->elemento != nullptr) {
+			cout << "test" << endl;
+			if (tablero[final_i][final_j]->elemento->tipo != "rey")
+			{
 				if (jugador_actual.numero == 0) {
-					jugador_1.capturas += tablero[init_i][init_j].elemento.nombre + "->" + tablero[final_i][final_j].elemento.nombre + ";";
+					jugador_1.capturas += tablero[init_i][init_j]->elemento->nombre + "->" + tablero[final_i][final_j]->elemento->nombre + ";";
 				}
 				else {
-					jugador_2.capturas += tablero[init_i][init_j].elemento.nombre + "->" + tablero[final_i][final_j].elemento.nombre + ";";
+					jugador_2.capturas += tablero[init_i][init_j]->elemento->nombre + "->" + tablero[final_i][final_j]->elemento->nombre + ";";
 				}
+				cout << "Good" << endl;
+			}
 
-				tablero[init_i][init_j].elemento.movimientos++;
-				tablero[init_i][init_j].elemento.posicion = tablero[final_i][final_j].posicion;
-				tablero[final_i][final_j].elemento = tablero[init_i][init_j].elemento;
-				tablero[init_i][init_j].elemento = Elemento(-1, "  ", "casilla", -1, { init_i, init_j });
+			else
+			{
+				if (tablero[final_i][final_j]->elemento->tipo == "rey") {
+					cout << "Jaque mate!" << endl;
 
-				for (int i = 0; i < 8; i++) {
-					for (int j = 0; j < 8; j++) {
-						string evento = to_string(tablero[i][j].elemento.jugador) + ";" +
-							tablero[i][j].elemento.nombre + ";" +
-							tablero[i][j].elemento.tipo + ";" +
-							to_string(tablero[i][j].elemento.movimientos) + ";" +
-							to_string(tablero[i][j].elemento.posicion[0]) + "," +
-							to_string(tablero[i][j].elemento.posicion[1]);
-						tablero[i][j].historial.push_back(evento);
+					movimientos++;
+					movimientos_totales.push_back(movement);
+					cout << "King test" << endl;
+
+					if (jugador_actual.numero == 0) {
+						jugador_1.capturas += tablero[init_i][init_j]->elemento->nombre + "->" + tablero[final_i][final_j]->elemento->nombre + ";";
 					}
-				}
+					else {
+						jugador_2.capturas += tablero[init_i][init_j]->elemento->nombre + "->" + tablero[final_i][final_j]->elemento->nombre + ";";
+					}
 
-				estado = "finished";
+					tablero[init_i][init_j]->elemento->movimientos++;
+					tablero[init_i][init_j]->elemento->posicion = tablero[final_i][final_j]->posicion;
+					tablero[final_i][final_j]->elemento = tablero[init_i][init_j]->elemento;
+					tablero[init_i][init_j]->elemento = nullptr;
 
-				ofstream archivo(ruta_guardado + nombre_archivo + ".txt");
+					cout << "King test 2" << endl;
 
-				if (archivo.is_open()) {
 					for (int i = 0; i < 8; i++) {
 						for (int j = 0; j < 8; j++) {
-							Elemento elem = tablero[i][j].elemento;
-							archivo << elem.jugador << ";"
-								<< elem.nombre << ";"
-								<< elem.tipo << ";"
-								<< elem.movimientos << ";"
-								<< elem.posicion[0] << "," << elem.posicion[1] << "\n";
-						}
-					}
-					archivo << estado << "\n";
-					archivo << jugador_actual.capturas << "\n";
-					archivo << jugador_actual.nombre << "\n";
-					archivo << jugador_actual.numero << "\n";
-					archivo << jugador_1.capturas << "\n";
-					archivo << jugador_1.nombre << "\n";
-					archivo << jugador_1.numero << "\n";
-					archivo << jugador_2.capturas << "\n";
-					archivo << jugador_2.nombre << "\n";
-					archivo << jugador_2.numero << "\n";
-					archivo << jugador_actual.nombre << "\n";
-					archivo << movimientos << "\n";
-					for (int i = 0; i < 8; i++) {
-						for (int j = 0; j < 8; j++) {
-							for (const string& jugada : tablero[i][j].historial) {
-								archivo << jugada << "/";
+							if (tablero[i][j]->elemento != nullptr) {
+								string evento = to_string(tablero[i][j]->elemento->jugador) + ";" +
+									tablero[i][j]->elemento->nombre + ";" +
+									tablero[i][j]->elemento->tipo + ";" +
+									to_string(tablero[i][j]->elemento->movimientos) + ";" +
+									to_string(tablero[i][j]->elemento->posicion[0]) + "," +
+									to_string(tablero[i][j]->elemento->posicion[1]);
+								tablero[i][j]->historial.push_back(evento);
 							}
-							archivo << "\n";
+							else {
+								tablero[i][j]->historial.push_back("-1;  ;Vacio;-1;" + to_string(i) + "," + to_string(j));
+							}
 						}
 					}
-					for (string elemento : movimientos_totales) {
-						archivo << elemento << "\n";
-					}
-					archivo.close();
-					cout << "Archivo creado y escrito exitosamente.\n";
-				}
-				else {
-					cerr << "Error al abrir el archivo.\n";
-				}
 
-				return 0;
+					estado = "finished";
+
+					ofstream archivo(ruta_guardado + nombre_archivo + ".txt");
+
+					if (archivo.is_open()) {
+						for (int i = 0; i < 8; i++) {
+							for (int j = 0; j < 8; j++) {
+								if (tablero[i][j]->elemento != nullptr) {
+									Elemento* elem = tablero[i][j]->elemento;
+									archivo << elem->jugador << ";"
+										<< elem->nombre << ";"
+										<< elem->tipo << ";"
+										<< elem->movimientos << ";"
+										<< elem->posicion[0] << "," << elem->posicion[1] << "\n";
+									cout << elem->jugador << endl;
+									cout << elem->nombre << endl;
+									cout << elem->movimientos << endl;
+								}
+								else {
+									archivo << "-1;  ;Vacio;-1;" << i << "," << j << "\n";
+								}
+							}
+						}
+						archivo << estado << "\n";
+						archivo << jugador_actual.capturas << "\n";
+						archivo << jugador_actual.nombre << "\n";
+						archivo << jugador_actual.numero << "\n";
+						archivo << jugador_1.capturas << "\n";
+						archivo << jugador_1.nombre << "\n";
+						archivo << jugador_1.numero << "\n";
+						archivo << jugador_2.capturas << "\n";
+						archivo << jugador_2.nombre << "\n";
+						archivo << jugador_2.numero << "\n";
+						archivo << jugador_actual.nombre << "\n";
+						archivo << movimientos << "\n";
+						for (int i = 0; i < 8; i++) {
+							for (int j = 0; j < 8; j++) {
+								for (string jugada : tablero[i][j]->historial) {
+									archivo << jugada << "/";
+								}
+								archivo << "\n";
+							}
+						}
+						for (string elemento : movimientos_totales) {
+							archivo << elemento << "\n";
+						}
+						archivo.close();
+						cout << "Archivo creado y escrito exitosamente.\n";
+					}
+					else {
+						cerr << "Error al abrir el archivo.\n";
+					}
+
+					// Liberando memoria
+					for (int i = 0; i < 8; i++) {
+						for (int j = 0; j < 8; j++) {
+							delete tablero[i][j];
+						}
+					}
+					cout << "Memoria liberada" << endl;
+
+					return 0;
+				}
 			}
 		}
 
 		movimientos++;
-		tablero[init_i][init_j].elemento.movimientos++;
-		tablero[init_i][init_j].elemento.posicion = tablero[final_i][final_j].posicion;
-		tablero[final_i][final_j].elemento = tablero[init_i][init_j].elemento;
-		tablero[init_i][init_j].elemento = Elemento(-1, "  ", "casilla", -1, { init_i, init_j });
+		tablero[init_i][init_j]->elemento->movimientos++;
+		tablero[init_i][init_j]->elemento->posicion = tablero[final_i][final_j]->posicion;
+
+		cout << "Test" << endl;
+		cout << tablero[final_i][final_j]->elemento << endl;
+		cout << tablero[init_i][init_j]->elemento << endl;
+		tablero[final_i][final_j]->elemento = tablero[init_i][init_j]->elemento;
+		tablero[init_i][init_j]->elemento = nullptr;
+		cout << "Test2" << endl;
 
 		if (jugador_actual.numero == 0)
 		{
@@ -754,13 +760,18 @@ int main()
 
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
-				string evento = to_string(tablero[i][j].elemento.jugador) + ";" +
-					tablero[i][j].elemento.nombre + ";" +
-					tablero[i][j].elemento.tipo + ";" +
-					to_string(tablero[i][j].elemento.movimientos) + ";" +
-					to_string(tablero[i][j].elemento.posicion[0]) + "," +
-					to_string(tablero[i][j].elemento.posicion[1]);
-				tablero[i][j].historial.push_back(evento);
+				if (tablero[i][j]->elemento != nullptr) {
+					string evento = to_string(tablero[i][j]->elemento->jugador) + ";" +
+						tablero[i][j]->elemento->nombre + ";" +
+						tablero[i][j]->elemento->tipo + ";" +
+						to_string(tablero[i][j]->elemento->movimientos) + ";" +
+						to_string(tablero[i][j]->elemento->posicion[0]) + "," +
+						to_string(tablero[i][j]->elemento->posicion[1]);
+					tablero[i][j]->historial.push_back(evento);
+				}
+				else {
+					tablero[i][j]->historial.push_back("-1;  ;Vacio;-1;" + to_string(i) + "," + to_string(j));
+				}
 			}
 		}
 
@@ -774,16 +785,22 @@ int main()
 			if (archivo.is_open()) {
 				for (int i = 0; i < 8; i++) {
 					for (int j = 0; j < 8; j++) {
-						Elemento elem = tablero[i][j].elemento;
-
-						archivo << elem.jugador << ";"
-							<< elem.nombre << ";"
-							<< elem.tipo << ";"
-							<< elem.movimientos << ";"
-							<< elem.posicion[0] << "," << elem.posicion[1] << "\n";
+						if (tablero[i][j]->elemento != nullptr) {
+							Elemento* elem = tablero[i][j]->elemento;
+							archivo << elem->jugador << ";"
+								<< elem->nombre << ";"
+								<< elem->tipo << ";"
+								<< elem->movimientos << ";"
+								<< elem->posicion[0] << "," << elem->posicion[1] << "\n";
+							cout << elem->jugador << endl;
+							cout << elem->nombre << endl;
+							cout << elem->movimientos << endl;
+						}
+						else {
+							archivo << "-1;  ;Vacio;-1;" << i << "," << j << "\n";
+						}
 					}
 				}
-
 				archivo << estado << "\n";
 				archivo << jugador_actual.capturas << "\n";
 				archivo << jugador_actual.nombre << "\n";
@@ -798,7 +815,7 @@ int main()
 				archivo << movimientos << "\n";
 				for (int i = 0; i < 8; i++) {
 					for (int j = 0; j < 8; j++) {
-						for (string jugada : tablero[i][j].historial) {
+						for (string jugada : tablero[i][j]->historial) {
 							archivo << jugada << "/";
 						}
 						archivo << "\n";
@@ -808,12 +825,19 @@ int main()
 					archivo << elemento << "\n";
 				}
 				archivo.close();
-
 				cout << "Archivo creado y escrito exitosamente.\n";
 			}
 			else {
 				cerr << "Error al abrir el archivo.\n";
 			}
+
+			// Liberando memoria
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					delete tablero[i][j];
+				}
+			}
+			cout << "Memoria liberada" << endl;
 
 			return 0;
 		}
