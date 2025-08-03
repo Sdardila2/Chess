@@ -4,9 +4,7 @@
 #include <fstream>
 #include <cstdlib> 
 #include <vector>
-#include <list>
 #include <filesystem>
-#include <SFML/Graphics.hpp>
 
 using namespace std;
 
@@ -73,7 +71,7 @@ void liberar_memoria(Casilla* tablero[8][8]) {
 	cout << "Memoria liberada" << endl;
 }
 
-void guardar(string ruta_guardado, string nombre_archivo, Casilla* tablero[8][8], string* estado, Jugador jugador_actual, Jugador jugador_1, Jugador jugador_2, int movimientos, vector<string> movimientos_totales) {
+void guardar(string ruta_guardado, string nombre_archivo, Casilla* tablero[8][8], string estado, Jugador jugador_actual, Jugador jugador_1, Jugador jugador_2, int movimientos, vector<string> movimientos_totales) {
 	ofstream archivo(ruta_guardado + nombre_archivo + ".txt");
 	if (archivo.is_open()) {
 		for (int i = 0; i < 8; i++) {
@@ -94,7 +92,7 @@ void guardar(string ruta_guardado, string nombre_archivo, Casilla* tablero[8][8]
 				}
 			}
 		}
-		archivo << *estado << "\n";
+		archivo << estado << "\n";
 		archivo << jugador_actual.capturas << "\n";
 		archivo << jugador_actual.nombre << "\n";
 		archivo << jugador_actual.numero << "\n";
@@ -125,8 +123,6 @@ void guardar(string ruta_guardado, string nombre_archivo, Casilla* tablero[8][8]
 	}
 }
 
-
-
 void cargar(string ruta_guardado, string* nombre_archivo, Casilla* tablero[8][8], string* estado, Jugador* jugador_actual, Jugador* jugador_1, Jugador* jugador_2, string* ganador, int* movimientos, vector<string>* movimientos_totales) {
 	cout << "Ingrese el nombre de la partida a cargar: " << endl;
 	cin >> *nombre_archivo;
@@ -140,27 +136,26 @@ void cargar(string ruta_guardado, string* nombre_archivo, Casilla* tablero[8][8]
 		while (getline(archivo, linea)) {
 			linea_num++;
 			if (linea_num <= 64) {
-				// Datos de las fichas
+
 				stringstream linea_externa(linea);
 				string token;
 
-				// jugador
 				getline(linea_externa, token, ';');
 				int jugador = stoi(token);
-				// nombre
+
 				getline(linea_externa, token, ';');
 				string nombre = token;
 
-				// tipo
+
 				getline(linea_externa, token, ';');
 				string tipo = token;
 
-				// movimientos
+
 				getline(linea_externa, token, ';');
 				int movimientos = stoi(token);
 
-				// posicion (fila,columna)
-				getline(linea_externa, token); // "fila,columna"
+
+				getline(linea_externa, token); 
 				stringstream linea_interna(token);
 				string parte;
 				getline(linea_interna, parte, ',');
@@ -168,7 +163,6 @@ void cargar(string ruta_guardado, string* nombre_archivo, Casilla* tablero[8][8]
 				getline(linea_interna, parte, ',');
 				int columna = stoi(parte);
 
-				// Crear y asignar ficha al tablero
 				if (jugador != -1) {
 					tablero[fila][columna]->elemento = new Elemento(jugador, nombre, tipo, movimientos, { fila, columna });
 				}
@@ -189,12 +183,10 @@ void cargar(string ruta_guardado, string* nombre_archivo, Casilla* tablero[8][8]
 			else if (linea_num == 75) *ganador = linea;
 			else if (linea_num == 76) *movimientos = stoi(linea);
 			else if (linea_num <= 140) {
-				//cout << linea_num - 76 << endl;
 				stringstream ss2(linea);
 				string temporal;
 				char delimitador = '/';
 				while (getline(ss2, temporal, delimitador)) {
-					//cout << "\"" << temporal << "\"" << " " << endl;
 
 					tablero[i][j]->historial.push_back(temporal);
 				}
@@ -207,7 +199,6 @@ void cargar(string ruta_guardado, string* nombre_archivo, Casilla* tablero[8][8]
 			}
 			else {
 				movimientos_totales->push_back(linea);
-				// cout << linea << endl;
 			}
 		}
 		archivo.close();
@@ -230,8 +221,8 @@ void cargar(string ruta_guardado, string* nombre_archivo, Casilla* tablero[8][8]
 				getline(aux, temporal2, delimitador2);
 				bool casillaClara = (i + j) % 2 == 0;
 
-				string fondo = casillaClara ? "\033[47m" : "\033[43m";  // Blanco o marrón (amarillo oscuro)
-				string texto = casillaClara ? "\033[30m" : "\033[30m";  // Texto negro en ambos casos
+				string fondo = casillaClara ? "\033[47m" : "\033[43m";  
+				string texto = casillaClara ? "\033[30m" : "\033[30m";  
 				string reset = "\033[0m";
 
 				string nombre = temporal2;
@@ -257,8 +248,8 @@ void cargar(string ruta_guardado, string* nombre_archivo, Casilla* tablero[8][8]
 			for (int j = 0; j < 8; j++) {
 				bool casillaClara = (i + j) % 2 == 0;
 
-				string fondo = casillaClara ? "\033[47m" : "\033[43m";  // Blanco o marrón (amarillo oscuro)
-				string texto = casillaClara ? "\033[30m" : "\033[30m";  // Texto negro en ambos casos
+				string fondo = casillaClara ? "\033[47m" : "\033[43m";  
+				string texto = casillaClara ? "\033[30m" : "\033[30m"; 
 				string reset = "\033[0m";
 				string nombre;
 
@@ -293,16 +284,61 @@ void cargar(string ruta_guardado, string* nombre_archivo, Casilla* tablero[8][8]
 	}
 }
 
+void crear_tablero(Jugador* jugador_1, Jugador* jugador_2, Jugador* jugador_actual, string* nombre_archivo, Casilla* tablero[8][8]) {
+	*jugador_1 = Jugador("", "", 0);
+	*jugador_2 = Jugador("", "", 1);
+	cout << "Ingrese el nombre de su nueva partida: " << endl;
+	cin >> *nombre_archivo;
+	cout << "Ingrese el nombre del jugador 0: " << endl;
+	cin >> jugador_1->nombre;
+	cout << "Ingrese el nombre del jugador 1: " << endl;
+	cin >> jugador_2->nombre;
+	*jugador_actual = *jugador_1;
+
+	tablero[1][0] = new Casilla({ 1, 0 }, new Elemento(jugador_1->numero, "P1", "peon", 0, { 1, 0 }), {});
+	tablero[1][1] = new Casilla({ 1, 1 }, new Elemento(jugador_1->numero, "P2", "peon", 0, { 1, 1 }), {});
+	tablero[1][2] = new Casilla({ 1, 2 }, new Elemento(jugador_1->numero, "P3", "peon", 0, { 1, 2 }), {});
+	tablero[1][3] = new Casilla({ 1, 3 }, new Elemento(jugador_1->numero, "P4", "peon", 0, { 1, 3 }), {});
+	tablero[1][4] = new Casilla({ 1, 4 }, new Elemento(jugador_1->numero, "P5", "peon", 0, { 1, 4 }), {});
+	tablero[1][5] = new Casilla({ 1, 5 }, new Elemento(jugador_1->numero, "P6", "peon", 0, { 1, 5 }), {});
+	tablero[1][6] = new Casilla({ 1, 6 }, new Elemento(jugador_1->numero, "P7", "peon", 0, { 1, 6 }), {});
+	tablero[1][7] = new Casilla({ 1, 7 }, new Elemento(jugador_1->numero, "P8", "peon", 0, { 1, 7 }), {});
+
+	tablero[0][0] = new Casilla({ 0, 0 }, new Elemento(jugador_1->numero, "T1", "torre", 0, { 0, 0 }), {});
+	tablero[0][1] = new Casilla({ 0, 1 }, new Elemento(jugador_1->numero, "C1", "caballo", 0, { 0, 1 }), {});
+	tablero[0][2] = new Casilla({ 0, 2 }, new Elemento(jugador_1->numero, "A1", "alfil", 0, { 0, 2 }), {});
+	tablero[0][3] = new Casilla({ 0, 3 }, new Elemento(jugador_1->numero, "R1", "rey", 0, { 0, 3 }), {});
+	tablero[0][4] = new Casilla({ 0, 4 }, new Elemento(jugador_1->numero, "D1", "dama", 0, { 0, 4 }), {});
+	tablero[0][5] = new Casilla({ 0, 5 }, new Elemento(jugador_1->numero, "A2", "alfil", 0, { 0, 5 }), {});
+	tablero[0][6] = new Casilla({ 0, 6 }, new Elemento(jugador_1->numero, "C2", "caballo", 0, { 0, 6 }), {});
+	tablero[0][7] = new Casilla({ 0, 7 }, new Elemento(jugador_1->numero, "T2", "torre", 0, { 0, 7 }), {});
+
+	tablero[6][0] = new Casilla({ 6, 0 }, new Elemento(jugador_2->numero, "PA", "peon", 0, { 6, 0 }), {});
+	tablero[6][1] = new Casilla({ 6, 1 }, new Elemento(jugador_2->numero, "PB", "peon", 0, { 6, 1 }), {});
+	tablero[6][2] = new Casilla({ 6, 2 }, new Elemento(jugador_2->numero, "PC", "peon", 0, { 6, 2 }), {});
+	tablero[6][3] = new Casilla({ 6, 3 }, new Elemento(jugador_2->numero, "PD", "peon", 0, { 6, 3 }), {});
+	tablero[6][4] = new Casilla({ 6, 4 }, new Elemento(jugador_2->numero, "PE", "peon", 0, { 6, 4 }), {});
+	tablero[6][5] = new Casilla({ 6, 5 }, new Elemento(jugador_2->numero, "PF", "peon", 0, { 6, 5 }), {});
+	tablero[6][6] = new Casilla({ 6, 6 }, new Elemento(jugador_2->numero, "PG", "peon", 0, { 6, 6 }), {});
+	tablero[6][7] = new Casilla({ 6, 7 }, new Elemento(jugador_2->numero, "PH", "peon", 0, { 6, 7 }), {});
+
+	tablero[7][0] = new Casilla({ 7, 0 }, new Elemento(jugador_2->numero, "TA", "torre", 0, { 7, 0 }), {});
+	tablero[7][1] = new Casilla({ 7, 1 }, new Elemento(jugador_2->numero, "CA", "caballo", 0, { 7, 1 }), {});
+	tablero[7][2] = new Casilla({ 7, 2 }, new Elemento(jugador_2->numero, "AA", "alfil", 0, { 7, 2 }), {});
+	tablero[7][3] = new Casilla({ 7, 3 }, new Elemento(jugador_2->numero, "RA", "rey", 0, { 7, 3 }), {});
+	tablero[7][4] = new Casilla({ 7, 4 }, new Elemento(jugador_2->numero, "DA", "dama", 0, { 7, 4 }), {});
+	tablero[7][5] = new Casilla({ 7, 5 }, new Elemento(jugador_2->numero, "AB", "alfil", 0, { 7, 5 }), {});
+	tablero[7][6] = new Casilla({ 7, 6 }, new Elemento(jugador_2->numero, "CB", "caballo", 0, { 7, 6 }), {});
+	tablero[7][7] = new Casilla({ 7, 7 }, new Elemento(jugador_2->numero, "TB", "torre", 0, { 7, 7 }), {});
+}
+
+
 int main()
 {
 
 	filesystem::path newDirectoryPath = filesystem::path(getenv("APPDATA")) / "Chess";
 	string ruta_guardado = (newDirectoryPath / "").string();
 	filesystem::create_directory(newDirectoryPath);
-
-
-	//gittest
-
 
 	int movimientos = 0;
 	int filas_movidas;
@@ -330,57 +366,8 @@ int main()
 	cout << "Desea crear una nueva partida o cargar una? (0 = nueva, 1 = cargar partida): " << endl;
 	cin >> op;
 	if (op == 0) {
-		jugador_1 = Jugador("", "", 0);
-		jugador_2 = Jugador("", "", 1);
-		cout << "Ingrese el nombre de su nueva partida: " << endl;
-		cin >> nombre_archivo;
-		cout << "Ingrese el nombre del jugador 0: " << endl;
-		cin >> jugador_1.nombre;
-		cout << "Ingrese el nombre del jugador 1: " << endl;
-		cin >> jugador_2.nombre;
-		jugador_actual = jugador_1;
-
-		// Peones del jugador 0 (blancas)
-		tablero[1][0] = new Casilla({ 1, 0 }, new Elemento(jugador_1.numero, "P1", "peon", 0, { 1, 0 }), {});
-		tablero[1][1] = new Casilla({ 1, 1 }, new Elemento(jugador_1.numero, "P2", "peon", 0, { 1, 1 }), {});
-		tablero[1][2] = new Casilla({ 1, 2 }, new Elemento(jugador_1.numero, "P3", "peon", 0, { 1, 2 }), {});
-		tablero[1][3] = new Casilla({ 1, 3 }, new Elemento(jugador_1.numero, "P4", "peon", 0, { 1, 3 }), {});
-		tablero[1][4] = new Casilla({ 1, 4 }, new Elemento(jugador_1.numero, "P5", "peon", 0, { 1, 4 }), {});
-		tablero[1][5] = new Casilla({ 1, 5 }, new Elemento(jugador_1.numero, "P6", "peon", 0, { 1, 5 }), {});
-		tablero[1][6] = new Casilla({ 1, 6 }, new Elemento(jugador_1.numero, "P7", "peon", 0, { 1, 6 }), {});
-		tablero[1][7] = new Casilla({ 1, 7 }, new Elemento(jugador_1.numero, "P8", "peon", 0, { 1, 7 }), {});
-
-		// Piezas principales del jugador 0
-		tablero[0][0] = new Casilla({ 0, 0 }, new Elemento(jugador_1.numero, "T1", "torre", 0, { 0, 0 }), {});
-		tablero[0][1] = new Casilla({ 0, 1 }, new Elemento(jugador_1.numero, "C1", "caballo", 0, { 0, 1 }), {});
-		tablero[0][2] = new Casilla({ 0, 2 }, new Elemento(jugador_1.numero, "A1", "alfil", 0, { 0, 2 }), {});
-		tablero[0][3] = new Casilla({ 0, 3 }, new Elemento(jugador_1.numero, "R1", "rey", 0, { 0, 3 }), {});
-		tablero[0][4] = new Casilla({ 0, 4 }, new Elemento(jugador_1.numero, "D1", "dama", 0, { 0, 4 }), {});
-		tablero[0][5] = new Casilla({ 0, 5 }, new Elemento(jugador_1.numero, "A2", "alfil", 0, { 0, 5 }), {});
-		tablero[0][6] = new Casilla({ 0, 6 }, new Elemento(jugador_1.numero, "C2", "caballo", 0, { 0, 6 }), {});
-		tablero[0][7] = new Casilla({ 0, 7 }, new Elemento(jugador_1.numero, "T2", "torre", 0, { 0, 7 }), {});
-
-		// Peones del jugador 1 (negras)
-		tablero[6][0] = new Casilla({ 6, 0 }, new Elemento(jugador_2.numero, "PA", "peon", 0, { 6, 0 }), {});
-		tablero[6][1] = new Casilla({ 6, 1 }, new Elemento(jugador_2.numero, "PB", "peon", 0, { 6, 1 }), {});
-		tablero[6][2] = new Casilla({ 6, 2 }, new Elemento(jugador_2.numero, "PC", "peon", 0, { 6, 2 }), {});
-		tablero[6][3] = new Casilla({ 6, 3 }, new Elemento(jugador_2.numero, "PD", "peon", 0, { 6, 3 }), {});
-		tablero[6][4] = new Casilla({ 6, 4 }, new Elemento(jugador_2.numero, "PE", "peon", 0, { 6, 4 }), {});
-		tablero[6][5] = new Casilla({ 6, 5 }, new Elemento(jugador_2.numero, "PF", "peon", 0, { 6, 5 }), {});
-		tablero[6][6] = new Casilla({ 6, 6 }, new Elemento(jugador_2.numero, "PG", "peon", 0, { 6, 6 }), {});
-		tablero[6][7] = new Casilla({ 6, 7 }, new Elemento(jugador_2.numero, "PH", "peon", 0, { 6, 7 }), {});
-
-		// Piezas principales del jugador 1
-		tablero[7][0] = new Casilla({ 7, 0 }, new Elemento(jugador_2.numero, "TA", "torre", 0, { 7, 0 }), {});
-		tablero[7][1] = new Casilla({ 7, 1 }, new Elemento(jugador_2.numero, "CA", "caballo", 0, { 7, 1 }), {});
-		tablero[7][2] = new Casilla({ 7, 2 }, new Elemento(jugador_2.numero, "AA", "alfil", 0, { 7, 2 }), {});
-		tablero[7][3] = new Casilla({ 7, 3 }, new Elemento(jugador_2.numero, "RA", "rey", 0, { 7, 3 }), {});
-		tablero[7][4] = new Casilla({ 7, 4 }, new Elemento(jugador_2.numero, "DA", "dama", 0, { 7, 4 }), {});
-		tablero[7][5] = new Casilla({ 7, 5 }, new Elemento(jugador_2.numero, "AB", "alfil", 0, { 7, 5 }), {});
-		tablero[7][6] = new Casilla({ 7, 6 }, new Elemento(jugador_2.numero, "CB", "caballo", 0, { 7, 6 }), {});
-		tablero[7][7] = new Casilla({ 7, 7 }, new Elemento(jugador_2.numero, "TB", "torre", 0, { 7, 7 }), {});
-
-		guardar(ruta_guardado, nombre_archivo, tablero, &estado, jugador_actual, jugador_1, jugador_2, movimientos, movimientos_totales);
+		crear_tablero(&jugador_1, &jugador_2, &jugador_actual, &nombre_archivo, tablero);
+		guardar(ruta_guardado, nombre_archivo, tablero, estado, jugador_actual, jugador_1, jugador_2, movimientos, movimientos_totales);
 	}
 	else {
 		cargar(ruta_guardado, &nombre_archivo, tablero, &estado, &jugador_actual, &jugador_1, &jugador_2, &ganador, &movimientos, &movimientos_totales);
@@ -393,7 +380,7 @@ int main()
 
 	while (true)
 	{
-		cout << "Movimiento actual: " << movimientos << endl;
+		cout << "Movimiento actual: " << movimientos+1<< endl;
 		cout << "Jugador actual: " << jugador_actual.nombre << endl;
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
@@ -612,7 +599,6 @@ int main()
 		cout << movement << endl;
 
 		if (tablero[final_i][final_j]->elemento != nullptr) {
-			cout << "test" << endl;
 			if (tablero[final_i][final_j]->elemento->tipo != "rey")
 			{
 				if (jugador_actual.numero == 0) {
@@ -621,7 +607,6 @@ int main()
 				else {
 					jugador_2.capturas += tablero[init_i][init_j]->elemento->nombre + "->" + tablero[final_i][final_j]->elemento->nombre + ";";
 				}
-				cout << "Good" << endl;
 			}
 
 			else
@@ -631,7 +616,6 @@ int main()
 
 					movimientos++;
 					movimientos_totales.push_back(movement);
-					cout << "King test" << endl;
 
 					if (jugador_actual.numero == 0) {
 						jugador_1.capturas += tablero[init_i][init_j]->elemento->nombre + "->" + tablero[final_i][final_j]->elemento->nombre + ";";
@@ -645,7 +629,6 @@ int main()
 					tablero[final_i][final_j]->elemento = tablero[init_i][init_j]->elemento;
 					tablero[init_i][init_j]->elemento = nullptr;
 
-					cout << "King test 2" << endl;
 
 					for (int i = 0; i < 8; i++) {
 						for (int j = 0; j < 8; j++) {
@@ -666,7 +649,7 @@ int main()
 
 					estado = "finished";
 
-					guardar(ruta_guardado, nombre_archivo, tablero, &estado, jugador_actual, jugador_1, jugador_2, movimientos, movimientos_totales);
+					guardar(ruta_guardado, nombre_archivo, tablero, estado, jugador_actual, jugador_1, jugador_2, movimientos, movimientos_totales);
 					liberar_memoria(tablero);
 
 					return 0;
@@ -716,7 +699,7 @@ int main()
 		cout << "Continuar?" << endl;
 		cin >> respuesta;
 		if (respuesta == "n") {
-			guardar(ruta_guardado, nombre_archivo, tablero, &estado, jugador_actual, jugador_1, jugador_2, movimientos, movimientos_totales);
+			guardar(ruta_guardado, nombre_archivo, tablero, estado, jugador_actual, jugador_1, jugador_2, movimientos, movimientos_totales);
 			liberar_memoria(tablero);
 			return 0;
 		}
