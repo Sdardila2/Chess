@@ -126,17 +126,17 @@ void guardar(string ruta_guardado, string nombre_archivo, Casilla* tablero[8][8]
 	}
 }
 
-void cargar(string ruta_guardado, string* nombre_archivo, Casilla* tablero[8][8], string* estado, Jugador* jugador_actual, Jugador* jugador_1, Jugador* jugador_2, string* ganador, int* movimientos, vector<string>* movimientos_totales, vector<string>* lista_de_directorios) {
+void cargar(string ruta_guardado, string* nombre_archivo, Casilla* tablero[8][8], string* estado, Jugador* jugador_actual, Jugador* jugador_1, Jugador* jugador_2, string* ganador, int* movimientos, vector<string>* movimientos_totales, vector<string>* lista_de_archivos) {
 
 	cout << "Lista de partidas: " << endl;
-	for (string archivo : *lista_de_directorios) {
+	for (string archivo : *lista_de_archivos) {
 		cout << archivo << endl;
 	}
 
 	cout << "Ingrese el nombre de la partida que desea cargar: " << endl;
 	while (true) {
 		cin >> *nombre_archivo;
-		if (find(lista_de_directorios->begin(), lista_de_directorios->end(), *nombre_archivo) == lista_de_directorios->end()) {
+		if (find(lista_de_archivos->begin(), lista_de_archivos->end(), *nombre_archivo) == lista_de_archivos->end()) {
 			cout << "No existe archivo con ese nombre, intente nuevamente." << endl;
 			continue;
 		}
@@ -302,10 +302,10 @@ void cargar(string ruta_guardado, string* nombre_archivo, Casilla* tablero[8][8]
 	}
 }
 
-void crear_tablero(Jugador* jugador_1, Jugador* jugador_2, Jugador* jugador_actual, string* nombre_archivo, Casilla* tablero[8][8], filesystem::path* ruta_carpeta, vector<string>* lista_de_directorios) {
+void crear_tablero(Jugador* jugador_1, Jugador* jugador_2, Jugador* jugador_actual, string* nombre_archivo, Casilla* tablero[8][8], filesystem::path* ruta_carpeta, vector<string>* lista_de_archivos) {
 
 	cout << "Lista de partidas: " << endl;
-	for (string archivo : *lista_de_directorios) {
+	for (string archivo : *lista_de_archivos) {
 		cout << archivo << endl;
 	}
 	*jugador_1 = Jugador("", "", 0);
@@ -314,7 +314,7 @@ void crear_tablero(Jugador* jugador_1, Jugador* jugador_2, Jugador* jugador_actu
 	cout << "Ingrese el nombre la partida que desea crear: " << endl;
 	while (true) {
 		cin >> *nombre_archivo;
-		if (find(lista_de_directorios->begin(), lista_de_directorios->end(), *nombre_archivo) == lista_de_directorios->end()) {
+		if (find(lista_de_archivos->begin(), lista_de_archivos->end(), *nombre_archivo) == lista_de_archivos->end()) {
 			break;
 		}
 		else {
@@ -799,8 +799,17 @@ int main()
 
 		movimientos_totales.push_back(movement);
 
-		cout << "Continuar?" << endl;
-		cin >> respuesta;
+		cout << "¿Continuar? (s/n)" << endl;
+		while (true) {
+			cin >> respuesta;
+			if (respuesta == "s" || respuesta == "n") {
+				break;
+			}
+			else {
+				cout << "Ingrese una opción válida." << endl;
+				continue;
+			}
+		}
 		if (respuesta == "n") {
 			guardar(ruta_guardado, nombre_archivo, tablero, estado, jugador_actual, jugador_1, jugador_2, movimientos, movimientos_totales);
 			liberar_memoria(tablero);
