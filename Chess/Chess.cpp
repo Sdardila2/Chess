@@ -5,7 +5,7 @@
 #include <cstdlib> 
 #include <vector>
 #include <filesystem>
-
+namespace fs = std::filesystem;
 using namespace std;
 
 class Elemento
@@ -126,9 +126,24 @@ void guardar(string ruta_guardado, string nombre_archivo, Casilla* tablero[8][8]
 	}
 }
 
-void cargar(string ruta_guardado, string* nombre_archivo, Casilla* tablero[8][8], string* estado, Jugador* jugador_actual, Jugador* jugador_1, Jugador* jugador_2, string* ganador, int* movimientos, vector<string>* movimientos_totales) {
-	cout << "Ingrese el nombre de la partida a cargar: " << endl;
-	cin >> *nombre_archivo;
+void cargar(string ruta_guardado, string* nombre_archivo, Casilla* tablero[8][8], string* estado, Jugador* jugador_actual, Jugador* jugador_1, Jugador* jugador_2, string* ganador, int* movimientos, vector<string>* movimientos_totales, vector<string>* lista_de_directorios) {
+
+	cout << "Lista de partidas: " << endl;
+	for (string archivo : *lista_de_directorios) {
+		cout << archivo << endl;
+	}
+
+	cout << "Ingrese el nombre de la partida que desea cargar: " << endl;
+	while (true) {
+		cin >> *nombre_archivo;
+		if (find(lista_de_directorios->begin(), lista_de_directorios->end(), *nombre_archivo) == lista_de_directorios->end()) {
+			cout << "No existe archivo con ese nombre, intente nuevamente." << endl;
+			continue;
+		}
+		else {
+			break;
+		}
+	}
 	ifstream archivo(ruta_guardado + *nombre_archivo + ".txt");
 	string linea;
 	int linea_num = 0;
@@ -158,7 +173,7 @@ void cargar(string ruta_guardado, string* nombre_archivo, Casilla* tablero[8][8]
 				int movimientos = stoi(token);
 
 
-				getline(linea_externa, token); 
+				getline(linea_externa, token);
 				stringstream linea_interna(token);
 				string parte;
 				getline(linea_interna, parte, ',');
@@ -224,8 +239,8 @@ void cargar(string ruta_guardado, string* nombre_archivo, Casilla* tablero[8][8]
 				getline(aux, temporal2, delimitador2);
 				bool casillaClara = (i + j) % 2 == 0;
 
-				string fondo = casillaClara ? "\033[47m" : "\033[43m";  
-				string texto = casillaClara ? "\033[30m" : "\033[30m";  
+				string fondo = casillaClara ? "\033[47m" : "\033[43m";
+				string texto = casillaClara ? "\033[30m" : "\033[30m";
 				string reset = "\033[0m";
 
 				string nombre = temporal2;
@@ -251,8 +266,8 @@ void cargar(string ruta_guardado, string* nombre_archivo, Casilla* tablero[8][8]
 			for (int j = 0; j < 8; j++) {
 				bool casillaClara = (i + j) % 2 == 0;
 
-				string fondo = casillaClara ? "\033[47m" : "\033[43m";  
-				string texto = casillaClara ? "\033[30m" : "\033[30m"; 
+				string fondo = casillaClara ? "\033[47m" : "\033[43m";
+				string texto = casillaClara ? "\033[30m" : "\033[30m";
 				string reset = "\033[0m";
 				string nombre;
 
@@ -287,11 +302,26 @@ void cargar(string ruta_guardado, string* nombre_archivo, Casilla* tablero[8][8]
 	}
 }
 
-void crear_tablero(Jugador* jugador_1, Jugador* jugador_2, Jugador* jugador_actual, string* nombre_archivo, Casilla* tablero[8][8]) {
+void crear_tablero(Jugador* jugador_1, Jugador* jugador_2, Jugador* jugador_actual, string* nombre_archivo, Casilla* tablero[8][8], filesystem::path* ruta_carpeta, vector<string>* lista_de_directorios) {
+
+	cout << "Lista de partidas: " << endl;
+	for (string archivo : *lista_de_directorios) {
+		cout << archivo << endl;
+	}
 	*jugador_1 = Jugador("", "", 0);
 	*jugador_2 = Jugador("", "", 1);
-	cout << "Ingrese el nombre de su nueva partida: " << endl;
-	cin >> *nombre_archivo;
+
+	cout << "Ingrese el nombre la partida que desea crear: " << endl;
+	while (true) {
+		cin >> *nombre_archivo;
+		if (find(lista_de_directorios->begin(), lista_de_directorios->end(), *nombre_archivo) == lista_de_directorios->end()) {
+			break;
+		}
+		else {
+			cout << "Ya existe una partida con ese nombre. Intente con un nombre diferente." << endl;
+			continue;
+		}
+	}
 	cout << "Ingrese el nombre del jugador 0: " << endl;
 	cin >> jugador_1->nombre;
 	cout << "Ingrese el nombre del jugador 1: " << endl;
@@ -370,6 +400,11 @@ int main()
 	filesystem::path newDirectoryPath = filesystem::path(getenv("APPDATA")) / "Chess";
 	string ruta_guardado = (newDirectoryPath / "").string();
 	filesystem::create_directory(newDirectoryPath);
+	vector<string> lista_de_archivos = {};
+
+	for (const auto& entry : fs::directory_iterator(newDirectoryPath)) {
+		lista_de_archivos.push_back(entry.path().stem().string());
+	}
 
 	int movimientos = 0;
 	int filas_movidas;
@@ -395,11 +430,11 @@ int main()
 	cout << "Desea crear una nueva partida o cargar una? (0 = nueva, 1 = cargar partida): " << endl;
 	cin >> op;
 	if (op == 0) {
-		crear_tablero(&jugador_1, &jugador_2, &jugador_actual, &nombre_archivo, tablero);
+		crear_tablero(&jugador_1, &jugador_2, &jugador_actual, &nombre_archivo, tablero, &newDirectoryPath, &lista_de_archivos);
 		guardar(ruta_guardado, nombre_archivo, tablero, estado, jugador_actual, jugador_1, jugador_2, movimientos, movimientos_totales);
 	}
 	else {
-		cargar(ruta_guardado, &nombre_archivo, tablero, &estado, &jugador_actual, &jugador_1, &jugador_2, &ganador, &movimientos, &movimientos_totales);
+		cargar(ruta_guardado, &nombre_archivo, tablero, &estado, &jugador_actual, &jugador_1, &jugador_2, &ganador, &movimientos, &movimientos_totales, &lista_de_archivos);
 		if (estado == "finished") {
 			return 0;
 		}
@@ -409,7 +444,7 @@ int main()
 
 	while (true)
 	{
-		cout << "Movimiento actual: " << movimientos+1<< endl;
+		cout << "Movimiento actual: " << movimientos + 1 << endl;
 		cout << "Jugador actual: " << jugador_actual.nombre << endl;
 		mostrar_tablero(tablero);
 
@@ -445,6 +480,12 @@ int main()
 				while (true) {
 					cout << "Posicion inicial de i: ";
 					cin >> init_i;
+					if (cin.fail()) {
+						cout << "Ingrese solo valores permitidos (numeros enteros)." << endl;
+						cin.clear();
+						cin.ignore(1000, '\n');
+						continue;
+					}
 					if (init_i < 0 || init_i > 7) {
 						cout << "Fuera de indice." << endl;
 						continue;
@@ -455,6 +496,12 @@ int main()
 				while (true) {
 					cout << "Posicion inicial de j: ";
 					cin >> init_j;
+					if (cin.fail()) {
+						cout << "Ingrese solo valores permitidos (numeros enteros)." << endl;
+						cin.clear();
+						cin.ignore(1000, '\n');
+						continue;
+					}
 					if (init_j < 0 || init_j > 7) {
 						cout << "Fuera de indice." << endl;
 						continue;
@@ -484,6 +531,12 @@ int main()
 				while (true) {
 					cout << "Posicion final de i: ";
 					cin >> final_i;
+					if (cin.fail()) {
+						cout << "Ingrese solo valores permitidos (numeros enteros)." << endl;
+						cin.clear();
+						cin.ignore(1000, '\n');
+						continue;
+					}
 					if (final_i < 0 || final_i > 7) {
 						cout << "Fuera de indice." << endl;
 						continue;
@@ -494,6 +547,12 @@ int main()
 				while (true) {
 					cout << "Posicion final de j: ";
 					cin >> final_j;
+					if (cin.fail()) {
+						cout << "Ingrese solo valores permitidos (numeros enteros)." << endl;
+						cin.clear();
+						cin.ignore(1000, '\n');
+						continue;
+					}
 					if (final_j < 0 || final_j > 7) {
 						cout << "Fuera de indice." << endl;
 						continue;
