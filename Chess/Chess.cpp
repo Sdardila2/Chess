@@ -63,7 +63,12 @@ public:
 void liberar_memoria(Casilla* tablero[8][8]) {
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
+			if (tablero[i][j]) {
+				delete tablero[i][j]->elemento;
+				tablero[i][j]->elemento = nullptr;
+			}
 			delete tablero[i][j];
+			tablero[i][j] = nullptr;
 		}
 	}
 	cout << "Memoria liberada" << endl;
@@ -437,12 +442,35 @@ int main()
 		while (true)
 		{
 			while (true) {
-				cout << "Posicion inicial de i: ";
-				cin >> init_i;
-				cout << "Posicion inicial de j: ";
-				cin >> init_j;
-				if (tablero[init_i][init_j]->elemento->jugador != jugador_actual.numero) {
-					cout << "No puede seleccionar una ficha ajena." << endl;
+				while (true) {
+					cout << "Posicion inicial de i: ";
+					cin >> init_i;
+					if (init_i < 0 || init_i > 7) {
+						cout << "Fuera de indice." << endl;
+						continue;
+					}
+					break;
+				}
+
+				while (true) {
+					cout << "Posicion inicial de j: ";
+					cin >> init_j;
+					if (init_j < 0 || init_j > 7) {
+						cout << "Fuera de indice." << endl;
+						continue;
+					}
+					break;
+				}
+
+
+				if (tablero[init_i][init_j]->elemento != nullptr) {
+					if (tablero[init_i][init_j]->elemento->jugador != jugador_actual.numero) {
+						cout << "No puede seleccionar una ficha ajena." << endl;
+						continue;
+					}
+				}
+				else {
+					cout << "No puede seleccionar una casilla vacia." << endl;
 					continue;
 				}
 				cout << "Ficha seleccionada: " << tablero[init_i][init_j]->elemento->tipo << endl;
@@ -452,10 +480,27 @@ int main()
 			}
 
 			while (true) {
-				cout << "Posicion final de i: ";
-				cin >> final_i;
-				cout << "Posicion final de j: ";
-				cin >> final_j;
+
+				while (true) {
+					cout << "Posicion final de i: ";
+					cin >> final_i;
+					if (final_i < 0 || final_i > 7) {
+						cout << "Fuera de indice." << endl;
+						continue;
+					}
+					break;
+				}
+
+				while (true) {
+					cout << "Posicion final de j: ";
+					cin >> final_j;
+					if (final_j < 0 || final_j > 7) {
+						cout << "Fuera de indice." << endl;
+						continue;
+					}
+					break;
+				}
+
 				if (tablero[final_i][final_j]->elemento != nullptr) {
 					if (tablero[final_i][final_j]->elemento->jugador == jugador_actual.numero) {
 						cout << "No puede sobreescribir sus propias fichas." << endl;
