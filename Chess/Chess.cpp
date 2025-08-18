@@ -15,17 +15,15 @@ public:
 	int movimientos;
 	string nombre;
 	string tipo;
-	vector <int> posicion;
 	Elemento()
 	{
 	}
-	Elemento(int x, string y, string z, int w, vector <int> v)
+	Elemento(int x, string y, string z, int w)
 	{
 		jugador = x;
 		nombre = y;
 		tipo = z;
 		movimientos = w;
-		posicion = v;
 	}
 };
 
@@ -82,7 +80,7 @@ void guardar(string ruta_guardado, string nombre_archivo, Casilla* tablero[8][8]
 						<< elem->nombre << ";"
 						<< elem->tipo << ";"
 						<< elem->movimientos << ";"
-						<< elem->posicion[0] << "," << elem->posicion[1] << "\n";
+						<< tablero[i][j]->posicion[0] << "," << tablero[i][j]->posicion[1] << "\n";
 					cout << elem->jugador << endl;
 					cout << elem->nombre << endl;
 					cout << elem->movimientos << endl;
@@ -164,7 +162,7 @@ void cargar(string ruta_guardado, string* nombre_archivo, Casilla* tablero[8][8]
 				int columna = stoi(parte);
 
 				if (jugador != -1) {
-					tablero[fila][columna]->elemento = new Elemento(jugador, nombre, tipo, movimientos, { fila, columna });
+					tablero[fila][columna]->elemento = new Elemento(jugador, nombre, tipo, movimientos);
 				}
 				else {
 					tablero[fila][columna]->elemento = nullptr;
@@ -295,43 +293,71 @@ void crear_tablero(Jugador* jugador_1, Jugador* jugador_2, Jugador* jugador_actu
 	cin >> jugador_2->nombre;
 	*jugador_actual = *jugador_1;
 
-	tablero[1][0] = new Casilla({ 1, 0 }, new Elemento(jugador_1->numero, "P1", "peon", 0, { 1, 0 }), {});
-	tablero[1][1] = new Casilla({ 1, 1 }, new Elemento(jugador_1->numero, "P2", "peon", 0, { 1, 1 }), {});
-	tablero[1][2] = new Casilla({ 1, 2 }, new Elemento(jugador_1->numero, "P3", "peon", 0, { 1, 2 }), {});
-	tablero[1][3] = new Casilla({ 1, 3 }, new Elemento(jugador_1->numero, "P4", "peon", 0, { 1, 3 }), {});
-	tablero[1][4] = new Casilla({ 1, 4 }, new Elemento(jugador_1->numero, "P5", "peon", 0, { 1, 4 }), {});
-	tablero[1][5] = new Casilla({ 1, 5 }, new Elemento(jugador_1->numero, "P6", "peon", 0, { 1, 5 }), {});
-	tablero[1][6] = new Casilla({ 1, 6 }, new Elemento(jugador_1->numero, "P7", "peon", 0, { 1, 6 }), {});
-	tablero[1][7] = new Casilla({ 1, 7 }, new Elemento(jugador_1->numero, "P8", "peon", 0, { 1, 7 }), {});
+	tablero[1][0]->elemento = new Elemento(jugador_1->numero, "P1", "peon", 0);
+	tablero[1][1]->elemento = new Elemento(jugador_1->numero, "P2", "peon", 0);
+	tablero[1][2]->elemento = new Elemento(jugador_1->numero, "P3", "peon", 0);
+	tablero[1][3]->elemento = new Elemento(jugador_1->numero, "P4", "peon", 0);
+	tablero[1][4]->elemento = new Elemento(jugador_1->numero, "P5", "peon", 0);
+	tablero[1][5]->elemento = new Elemento(jugador_1->numero, "P6", "peon", 0);
+	tablero[1][6]->elemento = new Elemento(jugador_1->numero, "P7", "peon", 0);
+	tablero[1][7]->elemento = new Elemento(jugador_1->numero, "P8", "peon", 0);
 
-	tablero[0][0] = new Casilla({ 0, 0 }, new Elemento(jugador_1->numero, "T1", "torre", 0, { 0, 0 }), {});
-	tablero[0][1] = new Casilla({ 0, 1 }, new Elemento(jugador_1->numero, "C1", "caballo", 0, { 0, 1 }), {});
-	tablero[0][2] = new Casilla({ 0, 2 }, new Elemento(jugador_1->numero, "A1", "alfil", 0, { 0, 2 }), {});
-	tablero[0][3] = new Casilla({ 0, 3 }, new Elemento(jugador_1->numero, "R1", "rey", 0, { 0, 3 }), {});
-	tablero[0][4] = new Casilla({ 0, 4 }, new Elemento(jugador_1->numero, "D1", "dama", 0, { 0, 4 }), {});
-	tablero[0][5] = new Casilla({ 0, 5 }, new Elemento(jugador_1->numero, "A2", "alfil", 0, { 0, 5 }), {});
-	tablero[0][6] = new Casilla({ 0, 6 }, new Elemento(jugador_1->numero, "C2", "caballo", 0, { 0, 6 }), {});
-	tablero[0][7] = new Casilla({ 0, 7 }, new Elemento(jugador_1->numero, "T2", "torre", 0, { 0, 7 }), {});
+	tablero[0][0]->elemento = new Elemento(jugador_1->numero, "T1", "torre", 0);
+	tablero[0][1]->elemento = new Elemento(jugador_1->numero, "C1", "caballo", 0);
+	tablero[0][2]->elemento = new Elemento(jugador_1->numero, "A1", "alfil", 0);
+	tablero[0][3]->elemento = new Elemento(jugador_1->numero, "R1", "rey", 0);
+	tablero[0][4]->elemento = new Elemento(jugador_1->numero, "D1", "dama", 0);
+	tablero[0][5]->elemento = new Elemento(jugador_1->numero, "A2", "alfil", 0);
+	tablero[0][6]->elemento = new Elemento(jugador_1->numero, "C2", "caballo", 0);
+	tablero[0][7]->elemento = new Elemento(jugador_1->numero, "T2", "torre", 0);
 
-	tablero[6][0] = new Casilla({ 6, 0 }, new Elemento(jugador_2->numero, "PA", "peon", 0, { 6, 0 }), {});
-	tablero[6][1] = new Casilla({ 6, 1 }, new Elemento(jugador_2->numero, "PB", "peon", 0, { 6, 1 }), {});
-	tablero[6][2] = new Casilla({ 6, 2 }, new Elemento(jugador_2->numero, "PC", "peon", 0, { 6, 2 }), {});
-	tablero[6][3] = new Casilla({ 6, 3 }, new Elemento(jugador_2->numero, "PD", "peon", 0, { 6, 3 }), {});
-	tablero[6][4] = new Casilla({ 6, 4 }, new Elemento(jugador_2->numero, "PE", "peon", 0, { 6, 4 }), {});
-	tablero[6][5] = new Casilla({ 6, 5 }, new Elemento(jugador_2->numero, "PF", "peon", 0, { 6, 5 }), {});
-	tablero[6][6] = new Casilla({ 6, 6 }, new Elemento(jugador_2->numero, "PG", "peon", 0, { 6, 6 }), {});
-	tablero[6][7] = new Casilla({ 6, 7 }, new Elemento(jugador_2->numero, "PH", "peon", 0, { 6, 7 }), {});
+	tablero[6][0]->elemento = new Elemento(jugador_2->numero, "PA", "peon", 0);
+	tablero[6][1]->elemento = new Elemento(jugador_2->numero, "PB", "peon", 0);
+	tablero[6][2]->elemento = new Elemento(jugador_2->numero, "PC", "peon", 0);
+	tablero[6][3]->elemento = new Elemento(jugador_2->numero, "PD", "peon", 0);
+	tablero[6][4]->elemento = new Elemento(jugador_2->numero, "PE", "peon", 0);
+	tablero[6][5]->elemento = new Elemento(jugador_2->numero, "PF", "peon", 0);
+	tablero[6][6]->elemento = new Elemento(jugador_2->numero, "PG", "peon", 0);
+	tablero[6][7]->elemento = new Elemento(jugador_2->numero, "PH", "peon", 0);
 
-	tablero[7][0] = new Casilla({ 7, 0 }, new Elemento(jugador_2->numero, "TA", "torre", 0, { 7, 0 }), {});
-	tablero[7][1] = new Casilla({ 7, 1 }, new Elemento(jugador_2->numero, "CA", "caballo", 0, { 7, 1 }), {});
-	tablero[7][2] = new Casilla({ 7, 2 }, new Elemento(jugador_2->numero, "AA", "alfil", 0, { 7, 2 }), {});
-	tablero[7][3] = new Casilla({ 7, 3 }, new Elemento(jugador_2->numero, "RA", "rey", 0, { 7, 3 }), {});
-	tablero[7][4] = new Casilla({ 7, 4 }, new Elemento(jugador_2->numero, "DA", "dama", 0, { 7, 4 }), {});
-	tablero[7][5] = new Casilla({ 7, 5 }, new Elemento(jugador_2->numero, "AB", "alfil", 0, { 7, 5 }), {});
-	tablero[7][6] = new Casilla({ 7, 6 }, new Elemento(jugador_2->numero, "CB", "caballo", 0, { 7, 6 }), {});
-	tablero[7][7] = new Casilla({ 7, 7 }, new Elemento(jugador_2->numero, "TB", "torre", 0, { 7, 7 }), {});
+	tablero[7][0]->elemento = new Elemento(jugador_2->numero, "TA", "torre", 0);
+	tablero[7][1]->elemento = new Elemento(jugador_2->numero, "CA", "caballo", 0);
+	tablero[7][2]->elemento = new Elemento(jugador_2->numero, "AA", "alfil", 0);
+	tablero[7][3]->elemento = new Elemento(jugador_2->numero, "RA", "rey", 0);
+	tablero[7][4]->elemento = new Elemento(jugador_2->numero, "DA", "dama", 0);
+	tablero[7][5]->elemento = new Elemento(jugador_2->numero, "AB", "alfil", 0);
+	tablero[7][6]->elemento = new Elemento(jugador_2->numero, "CB", "caballo", 0);
+	tablero[7][7]->elemento = new Elemento(jugador_2->numero, "TB", "torre", 0);
+
 }
 
+void mostrar_tablero(Casilla* tablero[8][8]) {
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
+			bool casillaClara = (i + j) % 2 == 0;
+
+			string fondo = casillaClara ? "\033[47m" : "\033[43m";  // Blanco o marrón (amarillo oscuro)
+			string texto = casillaClara ? "\033[30m" : "\033[30m";  // Texto negro en ambos casos
+			string reset = "\033[0m";
+			string nombre;
+
+			if (tablero[i][j]->elemento != nullptr) {
+				nombre = tablero[i][j]->elemento->nombre;
+			}
+			else {
+				nombre = "";
+			}
+			if (nombre.empty()) {
+				cout << fondo << texto << "  " << reset;
+			}
+			else {
+				if (nombre.length() == 1) nombre = " " + nombre;
+				cout << fondo << texto << nombre << reset;
+			}
+		}
+		cout << endl;
+	}
+}
 
 int main()
 {
@@ -356,9 +382,7 @@ int main()
 	Casilla* tablero[8][8];
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
-			if (i != 0 || i != 1 || i != 6 || i != 7) {
-				tablero[i][j] = new Casilla({ i, j }, nullptr, {});
-			}
+			tablero[i][j] = new Casilla({ i, j }, nullptr, {});
 		}
 	}
 
@@ -382,31 +406,7 @@ int main()
 	{
 		cout << "Movimiento actual: " << movimientos+1<< endl;
 		cout << "Jugador actual: " << jugador_actual.nombre << endl;
-		for (int i = 0; i < 8; i++) {
-			for (int j = 0; j < 8; j++) {
-				bool casillaClara = (i + j) % 2 == 0;
-
-				string fondo = casillaClara ? "\033[47m" : "\033[43m";  // Blanco o marrón (amarillo oscuro)
-				string texto = casillaClara ? "\033[30m" : "\033[30m";  // Texto negro en ambos casos
-				string reset = "\033[0m";
-				string nombre;
-
-				if (tablero[i][j]->elemento != nullptr) {
-					nombre = tablero[i][j]->elemento->nombre;
-				}
-				else {
-					nombre = "";
-				}
-				if (nombre.empty()) {
-					cout << fondo << texto << "  " << reset;
-				}
-				else {
-					if (nombre.length() == 1) nombre = " " + nombre;
-					cout << fondo << texto << nombre << reset;
-				}
-			}
-			cout << endl;
-		}
+		mostrar_tablero(tablero);
 
 		cout << "Elementos y posiciones disponibles:" << endl;
 
@@ -574,6 +574,9 @@ int main()
 					if (tablero[init_i][init_j]->elemento->movimientos > 0) {
 						max_filas = 1;
 					}
+					if (tablero[init_i][init_j]->elemento->jugador == 2) {
+						max_filas = -(max_filas);
+					}
 
 					if (columnas_movidas == 0 && filas_movidas <= max_filas && tablero[final_i][final_j]->elemento == nullptr) {
 						cout << "Movimiento vertical unitario" << endl;
@@ -625,7 +628,6 @@ int main()
 					}
 
 					tablero[init_i][init_j]->elemento->movimientos++;
-					tablero[init_i][init_j]->elemento->posicion = tablero[final_i][final_j]->posicion;
 					tablero[final_i][final_j]->elemento = tablero[init_i][init_j]->elemento;
 					tablero[init_i][init_j]->elemento = nullptr;
 
@@ -637,8 +639,8 @@ int main()
 									tablero[i][j]->elemento->nombre + ";" +
 									tablero[i][j]->elemento->tipo + ";" +
 									to_string(tablero[i][j]->elemento->movimientos) + ";" +
-									to_string(tablero[i][j]->elemento->posicion[0]) + "," +
-									to_string(tablero[i][j]->elemento->posicion[1]);
+									to_string(tablero[i][j]->posicion[0]) + "," +
+									to_string(tablero[i][j]->posicion[1]);
 								tablero[i][j]->historial.push_back(evento);
 							}
 							else {
@@ -659,14 +661,11 @@ int main()
 
 		movimientos++;
 		tablero[init_i][init_j]->elemento->movimientos++;
-		tablero[init_i][init_j]->elemento->posicion = tablero[final_i][final_j]->posicion;
 
-		cout << "Test" << endl;
 		cout << tablero[final_i][final_j]->elemento << endl;
 		cout << tablero[init_i][init_j]->elemento << endl;
 		tablero[final_i][final_j]->elemento = tablero[init_i][init_j]->elemento;
 		tablero[init_i][init_j]->elemento = nullptr;
-		cout << "Test2" << endl;
 
 		if (jugador_actual.numero == 0)
 		{
@@ -684,8 +683,8 @@ int main()
 						tablero[i][j]->elemento->nombre + ";" +
 						tablero[i][j]->elemento->tipo + ";" +
 						to_string(tablero[i][j]->elemento->movimientos) + ";" +
-						to_string(tablero[i][j]->elemento->posicion[0]) + "," +
-						to_string(tablero[i][j]->elemento->posicion[1]);
+						to_string(tablero[i][j]->posicion[0]) + "," +
+						to_string(tablero[i][j]->posicion[1]);
 					tablero[i][j]->historial.push_back(evento);
 				}
 				else {
