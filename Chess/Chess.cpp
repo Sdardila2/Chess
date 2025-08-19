@@ -416,24 +416,27 @@ int main()
 		lista_de_archivos.push_back(entry.path().stem().string());
 	}
 
-	while (true) {
+	
 
-	int movimientos = 0;
+	
 	int filas_movidas;
 	int columnas_movidas;
 	int init_i, init_j, final_i, final_j;
 
 	string respuesta;
 	string ganador;
-	string estado = "active";
+	
 	string nombre_archivo;
-	vector<string> movimientos_totales = {};
+	
 	Jugador jugador_actual;
 	Jugador jugador_1;
 	Jugador jugador_2;
 	Casilla* tablero[8][8];
 
-	
+	while (true) {
+	int movimientos = 0;
+	string estado = "active";
+	vector<string> movimientos_totales = {};
 
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
