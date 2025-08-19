@@ -416,6 +416,8 @@ int main()
 		lista_de_archivos.push_back(entry.path().stem().string());
 	}
 
+	while (true) {
+
 	int movimientos = 0;
 	int filas_movidas;
 	int columnas_movidas;
@@ -431,7 +433,7 @@ int main()
 	Jugador jugador_2;
 	Casilla* tablero[8][8];
 
-	while (true) {
+	
 
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
@@ -468,6 +470,7 @@ int main()
 				cout << "¿Desea continuar jugando? (s/n)" << endl;
 				cin >> respuesta;
 				if (respuesta == "s") {
+					system("cls");
 					continue;
 				}
 				else if (respuesta == "n") {
@@ -795,9 +798,10 @@ int main()
 						guardar(ruta_guardado, nombre_archivo, tablero, estado, jugador_actual, jugador_1, jugador_2, movimientos, movimientos_totales);
 						liberar_memoria(tablero);
 						string seguir;
-						cout << "¿Continuar? (s/n)" << endl;
+						cout << "¿Desea continuar jugando? (s/n)" << endl;
 						cin >> respuesta;
 						if (respuesta == "s") {
+							system("cls");
 							break;
 						}
 						else if (respuesta == "n") {
