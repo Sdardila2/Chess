@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
+ï»¿#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -60,6 +60,19 @@ public:
 	}
 };
 
+bool obstaculos_horizontales(Casilla* tablero[8][8], int* init_i, int* init_j, Jugador* jugador_actual) {
+
+	return false;
+}
+bool obstaculos_verticales(Casilla* tablero[8][8], int* init_i, int* init_j, Jugador* jugador_actual) {
+
+	return false;
+}
+bool obstaculos_diagonales(Casilla* tablero[8][8], int* init_i, int* init_j, Jugador* jugador_actual) {
+
+	return false;
+}
+
 void liberar_memoria(Casilla* tablero[8][8]) {
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
@@ -86,9 +99,6 @@ void guardar(string ruta_guardado, string nombre_archivo, Casilla* tablero[8][8]
 						<< elem->tipo << ";"
 						<< elem->movimientos << ";"
 						<< tablero[i][j]->posicion[0] << "," << tablero[i][j]->posicion[1] << "\n";
-					cout << elem->jugador << endl;
-					cout << elem->nombre << endl;
-					cout << elem->movimientos << endl;
 				}
 				else {
 					archivo << "-1;  ;Vacio;-1;" << i << "," << j << "\n";
@@ -260,7 +270,7 @@ void cargar(string ruta_guardado, string* nombre_archivo, Casilla* tablero[8][8]
 		cout << endl;
 	}
 	if (*estado == "finished") {
-		cout << "Este juego ya finalizó, te mostraremos el resultado final del tablero y los movimientos de cada jugador." << endl;
+		cout << "Este juego ya finalizÃ³, te mostraremos el resultado final del tablero y los movimientos de cada jugador." << endl;
 		cout << "Resultado final: " << endl;
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
@@ -371,7 +381,7 @@ void mostrar_tablero(Casilla* tablero[8][8]) {
 		for (int j = 0; j < 8; j++) {
 			bool casillaClara = (i + j) % 2 == 0;
 
-			string fondo = casillaClara ? "\033[47m" : "\033[43m";  // Blanco o marrón (amarillo oscuro)
+			string fondo = casillaClara ? "\033[47m" : "\033[43m";  // Blanco o marrÃ³n (amarillo oscuro)
 			string texto = casillaClara ? "\033[30m" : "\033[30m";  // Texto negro en ambos casos
 			string reset = "\033[0m";
 			string nombre;
@@ -420,221 +430,212 @@ int main()
 	Jugador jugador_1;
 	Jugador jugador_2;
 	Casilla* tablero[8][8];
-	for (int i = 0; i < 8; i++) {
-		for (int j = 0; j < 8; j++) {
-			tablero[i][j] = new Casilla({ i, j }, nullptr, {});
-		}
-	}
 
-	int op;
-	cout << "Desea crear una nueva partida o cargar una? (0 = nueva, 1 = cargar partida): " << endl;
-	cin >> op;
-	if (op == 0) {
-		crear_tablero(&jugador_1, &jugador_2, &jugador_actual, &nombre_archivo, tablero, &newDirectoryPath, &lista_de_archivos);
-		guardar(ruta_guardado, nombre_archivo, tablero, estado, jugador_actual, jugador_1, jugador_2, movimientos, movimientos_totales);
-	}
-	else {
-		cargar(ruta_guardado, &nombre_archivo, tablero, &estado, &jugador_actual, &jugador_1, &jugador_2, &ganador, &movimientos, &movimientos_totales, &lista_de_archivos);
-		if (estado == "finished") {
-			return 0;
-		}
-	}
+	while (true) {
 
-
-
-	while (true)
-	{
-		cout << "Movimiento actual: " << movimientos + 1 << endl;
-		cout << "Jugador actual: " << jugador_actual.nombre << endl;
-		mostrar_tablero(tablero);
-
-		cout << "Elementos y posiciones disponibles:" << endl;
-
-		for (int i = 0; i <= 8 - 1; i++)
-		{
-			for (int j = 0; j <= 8 - 1; j++)
-			{
-				if (tablero[i][j]->elemento != nullptr) {
-					if (tablero[i][j]->elemento->jugador == jugador_actual.numero)
-					{
-						cout << tablero[i][j]->posicion[0] << tablero[i][j]->posicion[1] << ":" << tablero[i][j]->elemento->nombre << endl;
-					}
-				}
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				tablero[i][j] = new Casilla({ i, j }, nullptr, {});
 			}
 		}
 
-		cout << endl << "Capturas: " << endl;
-		switch (jugador_actual.numero) {
-		case 0:
-			cout << jugador_1.capturas << endl;
+		int op;
+		while (true) {
+			cout << "Desea crear una nueva partida o cargar una? (0 = nueva, 1 = cargar partida): " << endl;
+			cin >> op;
+			if (cin.fail()) {
+				cout << "Ingrese un valor permitido (solo ser permiten enteros)." << endl;
+				cin.clear();
+				cin.ignore(1000, '\n');
+				continue;
+			}
+			if (op != 0 && op != 1) {
+				cout << "Ingrese un valor permitido (0 o 1)" << endl;
+				continue;
+			}
 			break;
-		case 1:
-			cout << jugador_2.capturas << endl;
+		}
+		system("cls");
+
+		if (op == 0) {
+			crear_tablero(&jugador_1, &jugador_2, &jugador_actual, &nombre_archivo, tablero, &newDirectoryPath, &lista_de_archivos);
+			guardar(ruta_guardado, nombre_archivo, tablero, estado, jugador_actual, jugador_1, jugador_2, movimientos, movimientos_totales);
+		}
+		else {
+			cargar(ruta_guardado, &nombre_archivo, tablero, &estado, &jugador_actual, &jugador_1, &jugador_2, &ganador, &movimientos, &movimientos_totales, &lista_de_archivos);
+			if (estado == "finished") {
+				string seguir;
+				cout << "Â¿Desea continuar jugando? (s/n)" << endl;
+				cin >> respuesta;
+				if (respuesta == "s") {
+					continue;
+				}
+				else if (respuesta == "n") {
+					return 0;
+				}
+			}
 		}
 
 
 
 		while (true)
 		{
-			while (true) {
-				while (true) {
-					cout << "Posicion inicial de i: ";
-					cin >> init_i;
-					if (cin.fail()) {
-						cout << "Ingrese solo valores permitidos (numeros enteros)." << endl;
-						cin.clear();
-						cin.ignore(1000, '\n');
-						continue;
-					}
-					if (init_i < 0 || init_i > 7) {
-						cout << "Fuera de indice." << endl;
-						continue;
-					}
-					break;
-				}
+			system("cls");
+			cout << "Movimiento actual: " << movimientos + 1 << endl;
+			cout << "Jugador actual: " << jugador_actual.nombre << endl;
+			mostrar_tablero(tablero);
 
-				while (true) {
-					cout << "Posicion inicial de j: ";
-					cin >> init_j;
-					if (cin.fail()) {
-						cout << "Ingrese solo valores permitidos (numeros enteros)." << endl;
-						cin.clear();
-						cin.ignore(1000, '\n');
-						continue;
-					}
-					if (init_j < 0 || init_j > 7) {
-						cout << "Fuera de indice." << endl;
-						continue;
-					}
-					break;
-				}
+			cout << "Elementos y posiciones disponibles:" << endl;
 
-
-				if (tablero[init_i][init_j]->elemento != nullptr) {
-					if (tablero[init_i][init_j]->elemento->jugador != jugador_actual.numero) {
-						cout << "No puede seleccionar una ficha ajena." << endl;
-						continue;
+			for (int i = 0; i <= 8 - 1; i++)
+			{
+				for (int j = 0; j <= 8 - 1; j++)
+				{
+					if (tablero[i][j]->elemento != nullptr) {
+						if (tablero[i][j]->elemento->jugador == jugador_actual.numero)
+						{
+							cout << tablero[i][j]->posicion[0] << tablero[i][j]->posicion[1] << ":" << tablero[i][j]->elemento->nombre << endl;
+						}
 					}
 				}
-				else {
-					cout << "No puede seleccionar una casilla vacia." << endl;
-					continue;
-				}
-				cout << "Ficha seleccionada: " << tablero[init_i][init_j]->elemento->tipo << endl;
-				cout << "Movimientos: " << tablero[init_i][init_j]->elemento->movimientos << endl;
-
-				break;
 			}
 
-			while (true) {
+			cout << endl << "Capturas: " << endl;
+			switch (jugador_actual.numero) {
+			case 0:
+				cout << jugador_1.capturas << endl;
+				break;
+			case 1:
+				cout << jugador_2.capturas << endl;
+			}
 
+
+
+			while (true)
+			{
 				while (true) {
-					cout << "Posicion final de i: ";
-					cin >> final_i;
-					if (cin.fail()) {
-						cout << "Ingrese solo valores permitidos (numeros enteros)." << endl;
-						cin.clear();
-						cin.ignore(1000, '\n');
-						continue;
-					}
-					if (final_i < 0 || final_i > 7) {
-						cout << "Fuera de indice." << endl;
-						continue;
-					}
-					break;
-				}
-
-				while (true) {
-					cout << "Posicion final de j: ";
-					cin >> final_j;
-					if (cin.fail()) {
-						cout << "Ingrese solo valores permitidos (numeros enteros)." << endl;
-						cin.clear();
-						cin.ignore(1000, '\n');
-						continue;
-					}
-					if (final_j < 0 || final_j > 7) {
-						cout << "Fuera de indice." << endl;
-						continue;
-					}
-					break;
-				}
-
-				if (tablero[final_i][final_j]->elemento != nullptr) {
-					if (tablero[final_i][final_j]->elemento->jugador == jugador_actual.numero) {
-						cout << "No puede sobreescribir sus propias fichas." << endl;
-						continue;
-					}
-				}
-
-				filas_movidas = abs(final_i - init_i);
-				columnas_movidas = abs(final_j - init_j);
-				cout << filas_movidas << endl;
-				cout << columnas_movidas << endl;
-
-				if (tablero[init_i][init_j]->elemento->tipo == "torre")
-				{
-					if (init_i == final_i && init_j != final_j)
-					{
-						cout << "Movimiento horizontal." << endl;
+					while (true) {
+						cout << "Posicion inicial de i: ";
+						cin >> init_i;
+						if (cin.fail()) {
+							cout << "Ingrese solo valores permitidos (numeros enteros)." << endl;
+							cin.clear();
+							cin.ignore(1000, '\n');
+							continue;
+						}
+						if (init_i < 0 || init_i > 7) {
+							cout << "Fuera de indice." << endl;
+							continue;
+						}
 						break;
 					}
-					else
-					{
-						if (init_j == final_j && init_i != final_i)
-						{
-							cout << "Movimiento vertical." << endl;
-							break;
 
+					while (true) {
+						cout << "Posicion inicial de j: ";
+						cin >> init_j;
+						if (cin.fail()) {
+							cout << "Ingrese solo valores permitidos (numeros enteros)." << endl;
+							cin.clear();
+							cin.ignore(1000, '\n');
+							continue;
 						}
-						else {
-							cout << "Movimiento invalido." << endl;
+						if (init_j < 0 || init_j > 7) {
+							cout << "Fuera de indice." << endl;
+							continue;
+						}
+						break;
+					}
+
+
+					if (tablero[init_i][init_j]->elemento != nullptr) {
+						if (tablero[init_i][init_j]->elemento->jugador != jugador_actual.numero) {
+							cout << "No puede seleccionar una ficha ajena." << endl;
 							continue;
 						}
 					}
+					else {
+						cout << "No puede seleccionar una casilla vacia." << endl;
+						continue;
+					}
+					cout << "Ficha seleccionada: " << tablero[init_i][init_j]->elemento->tipo << endl;
+					cout << "Movimientos: " << tablero[init_i][init_j]->elemento->movimientos << endl;
+
+					break;
 				}
 
-				else if (tablero[init_i][init_j]->elemento->tipo == "caballo") {
-					if (filas_movidas == 2 && columnas_movidas == 1) {
+				while (true) {
+
+					while (true) {
+						cout << "Posicion final de i: ";
+						cin >> final_i;
+						if (cin.fail()) {
+							cout << "Ingrese solo valores permitidos (numeros enteros)." << endl;
+							cin.clear();
+							cin.ignore(1000, '\n');
+							continue;
+						}
+						if (final_i < 0 || final_i > 7) {
+							cout << "Fuera de indice." << endl;
+							continue;
+						}
 						break;
 					}
-					else {
-						if (columnas_movidas == 2 && filas_movidas == 1) {
-							break;
+
+					while (true) {
+						cout << "Posicion final de j: ";
+						cin >> final_j;
+						if (cin.fail()) {
+							cout << "Ingrese solo valores permitidos (numeros enteros)." << endl;
+							cin.clear();
+							cin.ignore(1000, '\n');
+							continue;
 						}
-						else {
-							cout << "Movimiento invalido." << endl;
+						if (final_j < 0 || final_j > 7) {
+							cout << "Fuera de indice." << endl;
+							continue;
+						}
+						break;
+					}
+
+					if (tablero[final_i][final_j]->elemento != nullptr) {
+						if (tablero[final_i][final_j]->elemento->jugador == jugador_actual.numero) {
+							cout << "No puede sobreescribir sus propias fichas." << endl;
 							continue;
 						}
 					}
-				}
 
-				else if (tablero[init_i][init_j]->elemento->tipo == "alfil") {
-					if (filas_movidas == columnas_movidas) {
-						break;
-					}
-					else {
-						cout << "Movimiento invalido." << endl;
-						continue;
-					}
-					break;
+					filas_movidas = abs(final_i - init_i);
+					columnas_movidas = abs(final_j - init_j);
 
-				}
 
-				else if (tablero[init_i][init_j]->elemento->tipo == "dama") {
-					if (filas_movidas == 0 && columnas_movidas != 0)
+					if (tablero[init_i][init_j]->elemento->tipo == "torre")
 					{
-						break;
-					}
-					else
-					{
-						if (columnas_movidas == 0 && filas_movidas != 0)
+						if (init_i == final_i && init_j != final_j)
 						{
+							cout << "Movimiento horizontal." << endl;
 							break;
+						}
+						else
+						{
+							if (init_j == final_j && init_i != final_i)
+							{
+								cout << "Movimiento vertical." << endl;
+								break;
 
+							}
+							else {
+								cout << "Movimiento invalido." << endl;
+								continue;
+							}
+						}
+					}
+
+					else if (tablero[init_i][init_j]->elemento->tipo == "caballo") {
+						if (filas_movidas == 2 && columnas_movidas == 1) {
+							break;
 						}
 						else {
-							if (filas_movidas == columnas_movidas) {
+							if (columnas_movidas == 2 && filas_movidas == 1) {
 								break;
 							}
 							else {
@@ -643,179 +644,220 @@ int main()
 							}
 						}
 					}
-				}
 
-				else if (tablero[init_i][init_j]->elemento->tipo == "rey") {
-					if (columnas_movidas == 0 && filas_movidas == 1)
-					{
-						cout << "Movimiento horizontal" << endl;
-						break;
-					}
-					else
-					{
-						if (filas_movidas == 0 && columnas_movidas == 1)
-						{
-							cout << "Movimiento vertical" << endl;
-							break;
-
-						}
-						else {
-							if (filas_movidas == columnas_movidas && filas_movidas + columnas_movidas == 2) {
-								cout << "Movimiento diagonal" << endl;
-								break;
-							}
-							else {
-								cout << "Movimiento invalido" << endl;
-								continue;
-							}
-						}
-					}
-				}
-
-
-				else if (tablero[init_i][init_j]->elemento->tipo == "peon") {
-					int max_filas = 2;
-					if (tablero[init_i][init_j]->elemento->movimientos > 0) {
-						max_filas = 1;
-					}
-					if (tablero[init_i][init_j]->elemento->jugador == 2) {
-						max_filas = -(max_filas);
-					}
-
-					if (columnas_movidas == 0 && filas_movidas <= max_filas && tablero[final_i][final_j]->elemento == nullptr) {
-						cout << "Movimiento vertical unitario" << endl;
-						break;
-					}
-					else {
-						if (columnas_movidas == 1 && filas_movidas == 1 && tablero[final_i][final_j]->elemento != nullptr) {
-							cout << "Movimiento diagonal unitario" << endl;
+					else if (tablero[init_i][init_j]->elemento->tipo == "alfil") {
+						if (filas_movidas == columnas_movidas) {
 							break;
 						}
 						else {
 							cout << "Movimiento invalido." << endl;
 							continue;
 						}
+						break;
+
 					}
 
+					else if (tablero[init_i][init_j]->elemento->tipo == "dama") {
+						if (filas_movidas == 0 && columnas_movidas != 0)
+						{
+							break;
+						}
+						else
+						{
+							if (columnas_movidas == 0 && filas_movidas != 0)
+							{
+								break;
+
+							}
+							else {
+								if (filas_movidas == columnas_movidas) {
+									break;
+								}
+								else {
+									cout << "Movimiento invalido." << endl;
+									continue;
+								}
+							}
+						}
+					}
+
+					else if (tablero[init_i][init_j]->elemento->tipo == "rey") {
+						if (columnas_movidas == 0 && filas_movidas == 1)
+						{
+							cout << "Movimiento horizontal" << endl;
+							break;
+						}
+						else
+						{
+							if (filas_movidas == 0 && columnas_movidas == 1)
+							{
+								cout << "Movimiento vertical" << endl;
+								break;
+
+							}
+							else {
+								if (filas_movidas == columnas_movidas && filas_movidas + columnas_movidas == 2) {
+									cout << "Movimiento diagonal" << endl;
+									break;
+								}
+								else {
+									cout << "Movimiento invalido" << endl;
+									continue;
+								}
+							}
+						}
+					}
+
+
+					else if (tablero[init_i][init_j]->elemento->tipo == "peon") {
+						int max_filas = 2;
+						if (tablero[init_i][init_j]->elemento->movimientos > 0) {
+							max_filas = 1;
+						}
+						if (tablero[init_i][init_j]->elemento->jugador == 2) {
+							max_filas = -(max_filas);
+						}
+
+						if (columnas_movidas == 0 && filas_movidas <= max_filas && tablero[final_i][final_j]->elemento == nullptr) {
+							cout << "Movimiento vertical unitario" << endl;
+							break;
+						}
+						else {
+							if (columnas_movidas == 1 && filas_movidas == 1 && tablero[final_i][final_j]->elemento != nullptr) {
+								cout << "Movimiento diagonal unitario" << endl;
+								break;
+							}
+							else {
+								cout << "Movimiento invalido." << endl;
+								continue;
+							}
+						}
+
+					}
 				}
+				break;
 			}
-			break;
-		}
 
-		string movement = tablero[init_i][init_j]->elemento->nombre + ":{" + to_string(init_i) + ',' + to_string(init_j) + "}->{" + to_string(final_i) + "," + to_string(final_j) + "}" + " (" + jugador_actual.nombre + ")";
-		cout << movement << endl;
+			string movement = tablero[init_i][init_j]->elemento->nombre + ":{" + to_string(init_i) + ',' + to_string(init_j) + "}->{" + to_string(final_i) + "," + to_string(final_j) + "}" + " (" + jugador_actual.nombre + ")";
+			cout << movement << endl;
 
-		if (tablero[final_i][final_j]->elemento != nullptr) {
-			if (tablero[final_i][final_j]->elemento->tipo != "rey")
-			{
-				if (jugador_actual.numero == 0) {
-					jugador_1.capturas += tablero[init_i][init_j]->elemento->nombre + "->" + tablero[final_i][final_j]->elemento->nombre + ";";
-				}
-				else {
-					jugador_2.capturas += tablero[init_i][init_j]->elemento->nombre + "->" + tablero[final_i][final_j]->elemento->nombre + ";";
-				}
-			}
-
-			else
-			{
-				if (tablero[final_i][final_j]->elemento->tipo == "rey") {
-					cout << "Jaque mate!" << endl;
-
-					movimientos++;
-					movimientos_totales.push_back(movement);
-
+			if (tablero[final_i][final_j]->elemento != nullptr) {
+				if (tablero[final_i][final_j]->elemento->tipo != "rey")
+				{
 					if (jugador_actual.numero == 0) {
 						jugador_1.capturas += tablero[init_i][init_j]->elemento->nombre + "->" + tablero[final_i][final_j]->elemento->nombre + ";";
 					}
 					else {
 						jugador_2.capturas += tablero[init_i][init_j]->elemento->nombre + "->" + tablero[final_i][final_j]->elemento->nombre + ";";
 					}
+				}
 
-					tablero[init_i][init_j]->elemento->movimientos++;
-					tablero[final_i][final_j]->elemento = tablero[init_i][init_j]->elemento;
-					tablero[init_i][init_j]->elemento = nullptr;
+				else
+				{
+					if (tablero[final_i][final_j]->elemento->tipo == "rey") {
+						system("cls");
+						cout << "Jaque mate!" << endl;
+
+						movimientos++;
+						movimientos_totales.push_back(movement);
+
+						if (jugador_actual.numero == 0) {
+							jugador_1.capturas += tablero[init_i][init_j]->elemento->nombre + "->" + tablero[final_i][final_j]->elemento->nombre + ";";
+						}
+						else {
+							jugador_2.capturas += tablero[init_i][init_j]->elemento->nombre + "->" + tablero[final_i][final_j]->elemento->nombre + ";";
+						}
+
+						tablero[init_i][init_j]->elemento->movimientos++;
+						tablero[final_i][final_j]->elemento = tablero[init_i][init_j]->elemento;
+						tablero[init_i][init_j]->elemento = nullptr;
 
 
-					for (int i = 0; i < 8; i++) {
-						for (int j = 0; j < 8; j++) {
-							if (tablero[i][j]->elemento != nullptr) {
-								string evento = to_string(tablero[i][j]->elemento->jugador) + ";" +
-									tablero[i][j]->elemento->nombre + ";" +
-									tablero[i][j]->elemento->tipo + ";" +
-									to_string(tablero[i][j]->elemento->movimientos) + ";" +
-									to_string(tablero[i][j]->posicion[0]) + "," +
-									to_string(tablero[i][j]->posicion[1]);
-								tablero[i][j]->historial.push_back(evento);
-							}
-							else {
-								tablero[i][j]->historial.push_back("-1;  ;Vacio;-1;" + to_string(i) + "," + to_string(j));
+						for (int i = 0; i < 8; i++) {
+							for (int j = 0; j < 8; j++) {
+								if (tablero[i][j]->elemento != nullptr) {
+									string evento = to_string(tablero[i][j]->elemento->jugador) + ";" +
+										tablero[i][j]->elemento->nombre + ";" +
+										tablero[i][j]->elemento->tipo + ";" +
+										to_string(tablero[i][j]->elemento->movimientos) + ";" +
+										to_string(tablero[i][j]->posicion[0]) + "," +
+										to_string(tablero[i][j]->posicion[1]);
+									tablero[i][j]->historial.push_back(evento);
+								}
+								else {
+									tablero[i][j]->historial.push_back("-1;  ;Vacio;-1;" + to_string(i) + "," + to_string(j));
+								}
 							}
 						}
+
+						estado = "finished";
+
+						guardar(ruta_guardado, nombre_archivo, tablero, estado, jugador_actual, jugador_1, jugador_2, movimientos, movimientos_totales);
+						liberar_memoria(tablero);
+						string seguir;
+						cout << "Â¿Continuar? (s/n)" << endl;
+						cin >> respuesta;
+						if (respuesta == "s") {
+							break;
+						}
+						else if (respuesta == "n") {
+							return 0;
+						}
 					}
-
-					estado = "finished";
-
-					guardar(ruta_guardado, nombre_archivo, tablero, estado, jugador_actual, jugador_1, jugador_2, movimientos, movimientos_totales);
-					liberar_memoria(tablero);
-
-					return 0;
 				}
 			}
-		}
 
-		movimientos++;
-		tablero[init_i][init_j]->elemento->movimientos++;
+			movimientos++;
+			tablero[init_i][init_j]->elemento->movimientos++;
 
-		cout << tablero[final_i][final_j]->elemento << endl;
-		cout << tablero[init_i][init_j]->elemento << endl;
-		tablero[final_i][final_j]->elemento = tablero[init_i][init_j]->elemento;
-		tablero[init_i][init_j]->elemento = nullptr;
+			tablero[final_i][final_j]->elemento = tablero[init_i][init_j]->elemento;
+			tablero[init_i][init_j]->elemento = nullptr;
 
-		if (jugador_actual.numero == 0)
-		{
-			jugador_actual = jugador_2;
-		}
-		else
-		{
-			jugador_actual = jugador_1;
-		}
+			if (jugador_actual.numero == 0)
+			{
+				jugador_actual = jugador_2;
+			}
+			else
+			{
+				jugador_actual = jugador_1;
+			}
 
-		for (int i = 0; i < 8; i++) {
-			for (int j = 0; j < 8; j++) {
-				if (tablero[i][j]->elemento != nullptr) {
-					string evento = to_string(tablero[i][j]->elemento->jugador) + ";" +
-						tablero[i][j]->elemento->nombre + ";" +
-						tablero[i][j]->elemento->tipo + ";" +
-						to_string(tablero[i][j]->elemento->movimientos) + ";" +
-						to_string(tablero[i][j]->posicion[0]) + "," +
-						to_string(tablero[i][j]->posicion[1]);
-					tablero[i][j]->historial.push_back(evento);
+			for (int i = 0; i < 8; i++) {
+				for (int j = 0; j < 8; j++) {
+					if (tablero[i][j]->elemento != nullptr) {
+						string evento = to_string(tablero[i][j]->elemento->jugador) + ";" +
+							tablero[i][j]->elemento->nombre + ";" +
+							tablero[i][j]->elemento->tipo + ";" +
+							to_string(tablero[i][j]->elemento->movimientos) + ";" +
+							to_string(tablero[i][j]->posicion[0]) + "," +
+							to_string(tablero[i][j]->posicion[1]);
+						tablero[i][j]->historial.push_back(evento);
+					}
+					else {
+						tablero[i][j]->historial.push_back("-1;  ;Vacio;-1;" + to_string(i) + "," + to_string(j));
+					}
+				}
+			}
+
+			movimientos_totales.push_back(movement);
+
+			cout << "Â¿Desea continuar jugando? (s/n)" << endl;
+			while (true) {
+				cin >> respuesta;
+				if (respuesta == "s" || respuesta == "n") {
+					break;
 				}
 				else {
-					tablero[i][j]->historial.push_back("-1;  ;Vacio;-1;" + to_string(i) + "," + to_string(j));
+					cout << "Ingrese una opciÃ³n vÃ¡lida." << endl;
+					continue;
 				}
 			}
-		}
-
-		movimientos_totales.push_back(movement);
-
-		cout << "¿Continuar? (s/n)" << endl;
-		while (true) {
-			cin >> respuesta;
-			if (respuesta == "s" || respuesta == "n") {
-				break;
+			if (respuesta == "n") {
+				guardar(ruta_guardado, nombre_archivo, tablero, estado, jugador_actual, jugador_1, jugador_2, movimientos, movimientos_totales);
+				liberar_memoria(tablero);
+				return 0;
 			}
-			else {
-				cout << "Ingrese una opción válida." << endl;
-				continue;
-			}
+			system("cls");
 		}
-		if (respuesta == "n") {
-			guardar(ruta_guardado, nombre_archivo, tablero, estado, jugador_actual, jugador_1, jugador_2, movimientos, movimientos_totales);
-			liberar_memoria(tablero);
-			return 0;
-		}
-		system("cls");
 	}
-	return 0;
 }
